@@ -1,0 +1,12 @@
+# <type>(<scope>): <summary in imperative mood, ~50 chars, no period>
+#
+# Why is this change needed? What problem does it solve?
+# (Explain what and why, not how. Wrap at 72 chars.)
+#
+# Footer:
+# Closes #<issue>
+# BREAKING CHANGE: <what broke + how to migrate>
+# Co-authored-by: Name <email>
+#
+# Types: feat | fix | docs | style | refactor | perf | test | build | ci | chore
+# Scopes: <your project's list>
