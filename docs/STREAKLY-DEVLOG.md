@@ -71,17 +71,17 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
   - [X] `topics.subject_id` → `subjects.id`
   - [X] `study_sessions.topic_id` / `user_id`
   - [X] `daily_plans`, `daily_plan_items`, `friendships`, `reactions`
-- [ ] Add rules (CHECK constraints) → NFR_3
+- [X] Add rules (CHECK constraints) → NFR_3
   - [X] `ended_at > started_at`
   - [X] `estimated_hours > 0`
   - [X] `requester_id <> addressee_id` (no friending yourself)
   - [X] unique: subject name per user, topic name per subject
 - [X] Write it as numbered files: `db/001_tables.sql`, `db/002_constraints.sql`
-- [ ] Run each file in the Supabase **SQL Editor**
-- [ ] Add a trigger: auto-create a `profiles` row when someone signs up
+- [X] Run each file in the Supabase **SQL Editor**
+- [X] Add a trigger: auto-create a `profiles` row when someone signs up
 - [X] **Turn on RLS for every table** (see Gotchas below)
-- [ ] Test by hand: insert fake rows in Table Editor, try breaking a rule → should fail
-- [ ] Commit: `feat(db): schema v0.3`
+- [X] Test by hand: insert fake rows in Table Editor, try breaking a rule → should fail
+- [X] Commit: `feat(db): schema v0.3`
 
 ### Phase 2 — Server skeleton (Day 7–10)
 - [ ] Create `server/` → `npm init`, install Express + TypeScript
