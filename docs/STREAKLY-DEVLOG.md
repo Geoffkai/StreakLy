@@ -65,21 +65,21 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - [X] First commit: `chore: initial repo setup`
 
 ### Phase 1 — Database (Day 3–6)
-- [ ] Finish schema **v0.3** — add relationships (foreign keys)
-  - [ ] `profiles.id` → `auth.users(id)` (on delete cascade)
-  - [ ] `subjects.user_id` → `profiles.id`
-  - [ ] `topics.subject_id` → `subjects.id`
-  - [ ] `study_sessions.topic_id` / `user_id`
-  - [ ] `daily_plans`, `daily_plan_items`, `friendships`, `reactions`
+- [X] Finish schema **v0.3** — add relationships (foreign keys)
+  - [X] `profiles.id` → `auth.users(id)` (on delete cascade)
+  - [X] `subjects.user_id` → `profiles.id`
+  - [X] `topics.subject_id` → `subjects.id`
+  - [X] `study_sessions.topic_id` / `user_id`
+  - [X] `daily_plans`, `daily_plan_items`, `friendships`, `reactions`
 - [ ] Add rules (CHECK constraints) → NFR_3
-  - [ ] `ended_at > started_at`
-  - [ ] `estimated_hours > 0`
-  - [ ] `requester_id <> addressee_id` (no friending yourself)
-  - [ ] unique: subject name per user, topic name per subject
-- [ ] Write it as numbered files: `db/001_tables.sql`, `db/002_constraints.sql`
+  - [X] `ended_at > started_at`
+  - [X] `estimated_hours > 0`
+  - [X] `requester_id <> addressee_id` (no friending yourself)
+  - [X] unique: subject name per user, topic name per subject
+- [X] Write it as numbered files: `db/001_tables.sql`, `db/002_constraints.sql`
 - [ ] Run each file in the Supabase **SQL Editor**
 - [ ] Add a trigger: auto-create a `profiles` row when someone signs up
-- [ ] **Turn on RLS for every table** (see Gotchas below)
+- [X] **Turn on RLS for every table** (see Gotchas below)
 - [ ] Test by hand: insert fake rows in Table Editor, try breaking a rule → should fail
 - [ ] Commit: `feat(db): schema v0.3`
 
