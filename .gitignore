@@ -1,1 +1,21 @@
+# Dependencies (re-download anytime with npm install)
+node_modules/
+
+# Secret keys (Supabase, etc.)
 .env
+.env.*
+!.env.example
+
+# Build output (created when you build the app)
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
