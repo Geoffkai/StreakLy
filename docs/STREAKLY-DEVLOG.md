@@ -91,13 +91,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - [x] `GET /health` → returns `{ ok: true }`
 - [x] Connect to Supabase Postgres (connection string in `server/.env`)
 - [x] `GET /health/db` → runs `SELECT 1` to prove the DB connection works (route written, not yet tested)
-- [ ] Deploy to **Render** (env vars set in Render dashboard)
-- [ ] Commit: `feat(server): walking skeleton`
+- [x] Deploy to **Render** (env vars set in Render dashboard)
+- [x] Commit: `feat(server): walking skeleton`
 
 ### Phase 3 — Client skeleton (Day 11–13)
 
-- [ ] Create `client/` with Vite (React + TypeScript template)
-- [ ] Add Tailwind
+- [x] Create `client/` with Vite (React + TypeScript template)
+- [x] Add Tailwind
 - [ ] Page calls the API `/health` and shows "API connected ✅"
 - [ ] Deploy to **Vercel** (API URL in env var)
 - [ ] ✅ **Milestone: full skeleton live on the internet**
