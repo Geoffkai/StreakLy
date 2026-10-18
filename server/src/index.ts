@@ -1,8 +1,15 @@
 import "dotenv/config";
+import cors from "cors";
 import express from "express";
 import { pool } from "./config/db";
 
 const app = express(); //create the app
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN ?? "http://localhost:5173",
+  }),
+);
 app.use(express.json()); //let it read JSON request bodies
 
 app.get("/health", (req, res) => {
