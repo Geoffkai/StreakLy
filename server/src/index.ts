@@ -1,10 +1,22 @@
+import "dotenv/config";
 import express from "express";
+import { pool } from "./config/db";
 
 const app = express(); //create the app
 app.use(express.json()); //let it read JSON request bodies
 
 app.get("/health", (req, res) => {
   res.json({ ok: true });
+});
+
+app.get("/health/db", async (req, res) => {
+  try {
+    await pool.query("select 1");
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false });
+  }
 });
 
 const PORT = Number(process.env.PORT) || 3000;
