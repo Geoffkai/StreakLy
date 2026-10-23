@@ -90,7 +90,7 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - [x] Create `server/` → `npm init`, install Expres s + TypeScript
 - [x] `GET /health` → returns `{ ok: true }`
 - [x] Connect to Supabase Postgres (connection string in `server/.env`)
-- [x] `GET /health/db` → runs `SELECT 1` to prove the DB connection works (route written, not yet tested)
+- [x] `GET /health/db` → runs `SELECT 1` to prove the DB connection works
 - [x] Deploy to **Render** (env vars set in Render dashboard)
 - [x] Commit: `feat(server): walking skeleton`
 
@@ -98,9 +98,9 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 
 - [x] Create `client/` with Vite (React + TypeScript template)
 - [x] Add Tailwind
-- [ ] Page calls the API `/health` and shows "API connected ✅"
-- [ ] Deploy to **Vercel** (API URL in env var)
-- [ ] ✅ **Milestone: full skeleton live on the internet**
+- [x] Page calls the API `/health/db` and shows "Server: connected"
+- [x] Deploy to **Vercel** (API URL in env var)
+- [x] ✅ **Milestone: full skeleton live on the internet** (2026-10-23)
 
 ### Phase 4 — Auth (Day 14–20) → UC01–UC04 / FT_1–FT_4
 
@@ -202,6 +202,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** Express setup (`express.json()`, routes, `app.listen`), how a `pg` `Pool` takes the connection string from `.env`, and that the app should fail fast if `DATABASE_URL` is missing.
 - **Stuck on:** Nothing recorded yet. `/health/db` still needs a real run against Supabase.
 - **Next:** Run `npm run dev`, hit `/health` and `/health/db`, then commit the `src/` restructure and deploy to Render.
+
+### Day 4 — Fri, 2026-10-23
+
+- **Did:** Added CORS to the Express server (origin from `CLIENT_ORIGIN`), built the client health-check page with Vite + React + Tailwind, and deployed it to Vercel with `VITE_API_URL` pointing at the Render API. Set `CLIENT_ORIGIN` on Render to the Vercel production URL. The live page shows "Server: connected".
+- **Learned:** The browser blocks cross-origin API calls unless the server sends CORS headers. `VITE_` env vars are baked into the client bundle, so they must be public values. Client and server each need the other's URL, so deploy order matters. Vercel has a production domain, a branch alias and per-deploy URLs; only the production one goes in CORS.
+- **Stuck on:** `/health/db` hung on mobile data. Postgres connections stalled while HTTPS worked, and the same setup worked on school Wi-Fi, so the likely cause is my carrier filtering Postgres traffic. Fix for now: develop on Wi-Fi.
+- **Next:** Phase 4 — Supabase Auth: sign up / log in with `supabase-js`, then `requireAuth` middleware and `GET /me`.
 
 <!-- Copy the block below for each new day -->
 <!--
