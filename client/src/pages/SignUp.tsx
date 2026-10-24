@@ -18,7 +18,7 @@ export default function SignUp() {
       if (error) {
         setMessage(error.message);
       } else {
-        setMessage("Check your email to confirm");
+        setMessage("Check your email to confirm"); //This is set because in the production this should be the message
       }
     } catch {
       setMessage("Something went wrong");
@@ -46,6 +46,7 @@ export default function SignUp() {
         value={password}
         required
         autoComplete="new-password"
+        minLength={6}
       />
       <button type="submit" disabled={loading}>
         {loading ? "Creating Account" : "Sign Up"}
