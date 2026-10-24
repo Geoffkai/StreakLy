@@ -19,3 +19,9 @@ npm-debug.log*
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
+
+#Claude instructions
+CLAUDE.md
+
+#GUI Storyboard
+/design
