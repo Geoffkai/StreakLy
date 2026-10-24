@@ -151,6 +151,7 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 | D4  | 2026-10-13 | Supabase Auth for login; Express verifies the token                                                   | Don't build password handling yourself (security risk)                   |
 | D5  | 2026-10-17 | Express queries the DB with the `pg` driver (`Pool` in `server/src/config/db.ts`) + own TS interfaces | Good TS practice, no ORM magic. Drizzle can come later if needed         |
 | D6  | 2026-10-17 | Enforce commit style with commitlint + husky (+ `.gitmessage` template)                               | Consistent history (`feat(scope): ...`) from day one                     |
+| D7  | 2026-10-25 | "Confirm email" is OFF in Supabase while developing; decide before launch                             | Lets me test sign-up without real inboxes. Must revisit: with it off, anyone can register an email they don't own |
 
 ---
 
@@ -209,6 +210,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** The browser blocks cross-origin API calls unless the server sends CORS headers. `VITE_` env vars are baked into the client bundle, so they must be public values. Client and server each need the other's URL, so deploy order matters. Vercel has a production domain, a branch alias and per-deploy URLs; only the production one goes in CORS.
 - **Stuck on:** `/health/db` hung on mobile data. Postgres connections stalled while HTTPS worked, and the same setup worked on school Wi-Fi, so the likely cause is my carrier filtering Postgres traffic. Fix for now: develop on Wi-Fi.
 - **Next:** Phase 4 — Supabase Auth: sign up / log in with `supabase-js`, then `requireAuth` middleware and `GET /me`.
+
+### Day 5 — Sun, 2026-10-25
+
+- **Did:** Added `@supabase/supabase-js` and a shared client in `client/src/lib/supabase.ts` (fail-fast guard on the two env vars). Built the `SignUp` page (controlled inputs, `signUp`, loading state, error/success message) and tested short password, duplicate email and empty fields. Added the Supabase env vars on Vercel and redeployed; sign-up works on the live site and the `profiles` trigger creates the row.
+- **Learned:** The client talks to Supabase **Auth** (anon key, gets a JWT) while the server talks to the **Postgres** database; the token links them. A JWT carries `sub` (user id), `exp`, `email` and a DB `role`, and is signed so it can't be edited. `VITE_` vars are public by design (anon key and URL are safe; `service_role` never is). Vercel warns about `VITE_` + key names; I had to use "Change to Config" to save them.
+- **Stuck on:** Vercel blocked saving the `VITE_` variables until I switched them to Config. With confirmation off, `signUp` logs the user in, so the "Check your email" message is wrong for now.
+- **Next:** Log-in page (UC02, `signInWithPassword`), then a design pass on the shared auth screen, then `requireAuth` and `GET /me`.
 
 <!-- Copy the block below for each new day -->
 <!--
