@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SignUp from "./pages/SignUp";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,6 +20,7 @@ function App() {
     <main className="p-8">
       <h1 className="text-3xl font-bold text-blue-600">StreakLy</h1>
       <p className="mt-4">Server: {status}</p>
+      <SignUp />
     </main>
   );
 }
