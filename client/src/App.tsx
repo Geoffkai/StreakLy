@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
+import { Navigate, Routes, Route, Link } from "react-router";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,7 +22,14 @@ function App() {
     <main className="p-8">
       <h1 className="text-3xl font-bold text-blue-600">StreakLy</h1>
       <p className="mt-4">Server: {status}</p>
-      <SignUp />
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace></Navigate>} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+
+      <Link to="/signup">Sign Up</Link>
+      <Link to="/login">Log In</Link>
     </main>
   );
 }
