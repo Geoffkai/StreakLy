@@ -16,7 +16,7 @@ app.use(express.json()); //let it read JSON request bodies
 app.get("/me", requireAuth, async (req, res) => {
   try {
     const userId = res.locals.userId;
-    const result = await pool.query("SELECT * FROM profiles WHERE id = $1", [
+    const result = await pool.query("SELECT name FROM profiles WHERE id = $1", [
       userId,
     ]);
 

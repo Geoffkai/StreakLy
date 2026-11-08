@@ -104,11 +104,12 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 
 ### Phase 4 — Auth (Day 14–20) → UC01–UC04 / FT_1–FT_4
 
-- [ ] Client: Sign up + Log in with `supabase-js` (UC01, UC02)
+- [x] Client: Sign up + Log in with `supabase-js` (UC01, UC02)
+- [x] Client: React Router — `/` → `/login`, `/signup`, `/login`
 - [ ] Client: Log out (UC03), Reset password (UC04)
-- [ ] Server: `requireAuth` middleware — reads token, asks Supabase "who is this?"
-- [ ] Server: `GET /me` → returns the logged-in user's profile
-- [ ] Test: no token → `401`
+- [x] Server: `requireAuth` middleware — reads token, asks Supabase "who is this?" _(written, not yet tested)_
+- [x] Server: `GET /me` → returns the logged-in user's profile _(written, response shape needs fixing)_
+- [x] Test: no token → `401`
 
 ### Phase 5 — First real feature: Manage Subjects → UC05 / FT_5
 
@@ -143,15 +144,17 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 
 ## 3. Decisions Log
 
-| #   | Date       | Decision                                                                                              | Why                                                                      |
-| --- | ---------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| D1  | 2026-10-13 | Start database-first, then walking skeleton                                                           | Everything depends on tables; deploy early to avoid end-of-sem surprises |
-| D2  | 2026-10-13 | One repo, folders `client/`, `server/`, `db/`, `docs/`                                                | Simple for a solo dev; one place for code + SQL + docs                   |
-| D3  | 2026-10-13 | Create folders/files **only when needed**                                                             | Your SkolarTrack habit — avoids empty, confusing structure               |
-| D4  | 2026-10-13 | Supabase Auth for login; Express verifies the token                                                   | Don't build password handling yourself (security risk)                   |
-| D5  | 2026-10-17 | Express queries the DB with the `pg` driver (`Pool` in `server/src/config/db.ts`) + own TS interfaces | Good TS practice, no ORM magic. Drizzle can come later if needed         |
-| D6  | 2026-10-17 | Enforce commit style with commitlint + husky (+ `.gitmessage` template)                               | Consistent history (`feat(scope): ...`) from day one                     |
-| D7  | 2026-10-25 | "Confirm email" is OFF in Supabase while developing; decide before launch                             | Lets me test sign-up without real inboxes. Must revisit: with it off, anyone can register an email they don't own |
+| #   | Date       | Decision                                                                                                               | Why                                                                                                                                                                                  |
+| --- | ---------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | 2026-10-13 | Start database-first, then walking skeleton                                                                            | Everything depends on tables; deploy early to avoid end-of-sem surprises                                                                                                             |
+| D2  | 2026-10-13 | One repo, folders `client/`, `server/`, `db/`, `docs/`                                                                 | Simple for a solo dev; one place for code + SQL + docs                                                                                                                               |
+| D3  | 2026-10-13 | Create folders/files **only when needed**                                                                              | Your SkolarTrack habit — avoids empty, confusing structure                                                                                                                           |
+| D4  | 2026-10-13 | Supabase Auth for login; Express verifies the token                                                                    | Don't build password handling yourself (security risk)                                                                                                                               |
+| D5  | 2026-10-17 | Express queries the DB with the `pg` driver (`Pool` in `server/src/config/db.ts`) + own TS interfaces                  | Good TS practice, no ORM magic. Drizzle can come later if needed                                                                                                                     |
+| D6  | 2026-10-17 | Enforce commit style with commitlint + husky (+ `.gitmessage` template)                                                | Consistent history (`feat(scope): ...`) from day one                                                                                                                                 |
+| D7  | 2026-10-25 | "Confirm email" is OFF in Supabase while developing; decide before launch                                              | Lets me test sign-up without real inboxes. Must revisit: with it off, anyone can register an email they don't own                                                                    |
+| D8  | 2026-11-08 | Keep SQL inline in `server/src/index.ts` until Phase 5, then split into routes/models                                  | Follows D3: only one real route so far, so a models folder would be empty structure                                                                                                  |
+| D9  | 2026-11-08 | Server Supabase client is stateless (`persistSession: false`, `autoRefreshToken: false`); verify with `getUser(token)` | Every request brings its own token, so the server must never hold a session. `getUser` asks Supabase, so it also rejects tokens from users who signed out (a local JWT decode can't) |
 
 ---
 
@@ -167,6 +170,10 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **`.env` never goes in Git.** Add it to `.gitignore` before your first commit.
 - **Time zones.** Store timestamps in UTC; streaks use `local_date` (the student's own day).
 - **Free tier pauses** after ~1 week with no activity. Opening the dashboard wakes it up.
+  - Symptom: `pg` error `tenant/user postgres.<project> not found` from the pooler.
+- **Never trust a user id from the URL or body.** The server takes it from the verified token only (`res.locals.userId`).
+- **Empty token = danger.** `getUser("")` falls back to the client's saved session, so `requireAuth` must reject a missing token before calling it.
+- **`npm audit fix --force` can downgrade packages** across major versions. Read what it changes; revert with `git checkout -- package.json package-lock.json`.
 
 ---
 
@@ -217,6 +224,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** The client talks to Supabase **Auth** (anon key, gets a JWT) while the server talks to the **Postgres** database; the token links them. A JWT carries `sub` (user id), `exp`, `email` and a DB `role`, and is signed so it can't be edited. `VITE_` vars are public by design (anon key and URL are safe; `service_role` never is). Vercel warns about `VITE_` + key names; I had to use "Change to Config" to save them.
 - **Stuck on:** Vercel blocked saving the `VITE_` variables until I switched them to Config. With confirmation off, `signUp` logs the user in, so the "Check your email" message is wrong for now.
 - **Next:** Log-in page (UC02, `signInWithPassword`), then a design pass on the shared auth screen, then `requireAuth` and `GET /me`.
+
+### Day 6 — Fri–Sun, 2026-11-06 to 2026-11-08
+
+- **Did:** Built the `Login` page (`signInWithPassword`, `autoComplete="current-password"`). Added React Router: `BrowserRouter` in `main.tsx`, routes for `/signup` and `/login`, `/` redirects to `/login`. Reverted an `npm audit fix --force` that downgraded eslint 10 → 9. On the server: added `@supabase/supabase-js`, a stateless client in `server/src/lib/supabase.ts`, the `requireAuth` middleware (checks header, `Bearer` format, empty token, then `getUser(token)`, stores `res.locals.userId`), and a first version of `GET /me` (parameterized `SELECT` on `profiles`, 404 if missing).
+- **Learned:** `BrowserRouter` must wrap everything that uses router hooks or `<Link>`. `<Link>` uses `history.pushState` instead of reloading the page. StrictMode is dev-only and runs effects twice. `VITE_` vars are for the browser; the server reads plain `process.env`. Browser client keeps the session in localStorage and refreshes it; the server client must keep nothing, because each request carries its own identity. Middleware either rejects or calls `next()`, never both. `res.locals` is per-request storage, not localStorage. Same error for wrong email and wrong password prevents user enumeration. Parameterized SQL (`$1`) stops SQL injection.
+- **Stuck on:** Supabase project was paused, so the pooler said "tenant/user not found" (restored it). `--force` broke eslint. Took a while to understand why the server must not save a session.
+- **Next:** Make `GET /me` send only the profile row (not the whole `pg` result) and list columns instead of `SELECT *`. Set `engines.node` to `>=22` in `server/package.json` (supabase-js needs it). Curl-test `/me`: no header, `Basic`, garbage token → 401; real token → 200. Commit, add `SUPABASE_URL` + `SUPABASE_ANON_KEY` on Render, test live. Later: Vercel refresh 404 on `/login` (SPA rewrite), Log out (UC03), Reset password (UC04).
 
 <!-- Copy the block below for each new day -->
 <!--
