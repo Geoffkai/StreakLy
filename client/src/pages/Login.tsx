@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 
 export default function Login() {
@@ -6,6 +7,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   //This is what happens when the user clicks Login button
   async function handleSubmit(e: React.FormEvent) {
@@ -15,14 +17,14 @@ export default function Login() {
     setMessage("");
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) {
         setMessage(error.message);
       } else {
-        setMessage(`Logged in as ${data.user.email}`);
+        navigate("/today", { replace: true });
       }
     } catch {
       setMessage("Something went wrong");
