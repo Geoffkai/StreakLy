@@ -7,7 +7,7 @@ export default function Today() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleLogout(e: React.FormEvent) {
+  async function handleLogout() {
     setMessage("");
     setLoading(true);
     try {
