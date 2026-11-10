@@ -4,6 +4,8 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Today from "./pages/Today";
 import { useAuth } from "./auth/useAuth";
+import RequireAuth from "./auth/RequireAuth";
+import RedirectIfAuthed from "./auth/RedirectIfAuthed";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -34,10 +36,14 @@ function App() {
             : "logged out"}
       </p>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace></Navigate>} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/today" element={<Today />} />
+        <Route path="/" element={<Navigate to="/today" replace></Navigate>} />
+        <Route element={<RedirectIfAuthed />}>
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
+        <Route element={<RequireAuth />}>
+          <Route path="/today" element={<Today />} />
+        </Route>
       </Routes>
 
       <Link to="/signup">Sign Up</Link>
