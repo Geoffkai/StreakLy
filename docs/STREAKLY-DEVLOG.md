@@ -105,11 +105,19 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 ### Phase 4 — Auth (Day 14–20) → UC01–UC04 / FT_1–FT_4
 
 - [x] Client: Sign up + Log in with `supabase-js` (UC01, UC02)
-- [x] Client: React Router — `/` → `/login`, `/signup`, `/login`
-- [ ] Client: Log out (UC03), Reset password (UC04)
+- [x] Client: React Router — `/signup`, `/login`, `/today` (`/` → `/today` for now, until the landing page)
+- [x] Client: Vercel SPA rewrite (`client/vercel.json`) so refreshing `/login` doesn't 404
+- [x] Client: `AuthProvider` + `useAuth` — one shared session (`undefined` loading / `null` logged out / `Session`)
+- [x] Client: Route guards — `RequireAuth` (logged-out → `/login`, remembers where they were going) and `RedirectIfAuthed` (logged-in → back to that page, else `/today`)
+- [x] Client: Log out (UC03)
+- [ ] Client: Reset password (UC04)
 - [x] Server: `requireAuth` middleware — reads token, asks Supabase "who is this?" _(written, not yet tested)_
-- [x] Server: `GET /me` → returns the logged-in user's profile _(written, response shape needs fixing)_
+- [x] Server: `GET /me` → returns `{ profile: { name } }` (no more raw `pg` result)
 - [x] Test: no token → `401`
+
+### Phase 4.5 — Landing page
+
+- [ ] Client: Landing page on `/` for logged-out visitors (Ember Evolved + StreakLy Brand & UI)
 
 ### Phase 5 — First real feature: Manage Subjects → UC05 / FT_5
 
@@ -155,6 +163,9 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 | D7  | 2026-10-25 | "Confirm email" is OFF in Supabase while developing; decide before launch                                              | Lets me test sign-up without real inboxes. Must revisit: with it off, anyone can register an email they don't own                                                                    |
 | D8  | 2026-11-08 | Keep SQL inline in `server/src/index.ts` until Phase 5, then split into routes/models                                  | Follows D3: only one real route so far, so a models folder would be empty structure                                                                                                  |
 | D9  | 2026-11-08 | Server Supabase client is stateless (`persistSession: false`, `autoRefreshToken: false`); verify with `getUser(token)` | Every request brings its own token, so the server must never hold a session. `getUser` asks Supabase, so it also rejects tokens from users who signed out (a local JWT decode can't) |
+| D10 | 2026-11-10 | Client session comes only from `onAuthStateChange` (no separate `getSession()`), shared through `AuthProvider`         | Subscribing fires `INITIAL_SESSION` right away, then login, logout, token refresh and other tabs. One source means no race between two calls                                         |
+| D11 | 2026-11-11 | Redirects live in the route guards only; pages (Login, Today) never `navigate` after auth changes                      | One place decides where the user goes. Logout in another tab or a "go back to where you were" redirect then works without extra code in each page                                    |
+| D12 | 2026-11-11 | Landing page on `/` combines the Ember Evolved exploration with StreakLy Brand & UI                                    | The direction the user chose                                                                                                                                                         |
 
 ---
 
@@ -174,6 +185,10 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Never trust a user id from the URL or body.** The server takes it from the verified token only (`res.locals.userId`).
 - **Empty token = danger.** `getUser("")` falls back to the client's saved session, so `requireAuth` must reject a missing token before calling it.
 - **`npm audit fix --force` can downgrade packages** across major versions. Read what it changes; revert with `git checkout -- package.json package-lock.json`.
+- **Single-page apps 404 on refresh in production.** Vercel looks for a real `/login` file. `vercel.json` rewrites every path to `index.html` so React Router can handle it.
+- **Hooks go before any early `return`.** React needs hooks called in the same order every render; a `return null` above `useLocation()` would skip it on some renders.
+- **Don't redirect while the session is still `undefined`.** Supabase hasn't answered yet; guessing "logged out" sends logged-in users to `/login` on every refresh.
+- **Commit new files together with the files that import them.** Untracked files don't show in `git diff`; committing only `App.tsx` would break the build at that commit.
 
 ---
 
@@ -185,6 +200,9 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Migration** — a numbered SQL file that changes the database. Run in order.
 - **Walking skeleton** — the thinnest version of the whole app, deployed, end to end.
 - **RLS** — Postgres rules that control which rows each user can see.
+- **Context / Provider** — a "bulletin board" in React: the Provider pins a value up, any component below reads it (`useAuth()`) without passing props down.
+- **Route guard** — a layout route that checks something (logged in?) and either redirects with `<Navigate>` or shows the page with `<Outlet />`.
+- **Navigate `state`** — a note attached to a redirect; the next page reads it with `useLocation().state`.
 
 ---
 
@@ -231,6 +249,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** `BrowserRouter` must wrap everything that uses router hooks or `<Link>`. `<Link>` uses `history.pushState` instead of reloading the page. StrictMode is dev-only and runs effects twice. `VITE_` vars are for the browser; the server reads plain `process.env`. Browser client keeps the session in localStorage and refreshes it; the server client must keep nothing, because each request carries its own identity. Middleware either rejects or calls `next()`, never both. `res.locals` is per-request storage, not localStorage. Same error for wrong email and wrong password prevents user enumeration. Parameterized SQL (`$1`) stops SQL injection.
 - **Stuck on:** Supabase project was paused, so the pooler said "tenant/user not found" (restored it). `--force` broke eslint. Took a while to understand why the server must not save a session.
 - **Next:** Make `GET /me` send only the profile row (not the whole `pg` result) and list columns instead of `SELECT *`. Set `engines.node` to `>=22` in `server/package.json` (supabase-js needs it). Curl-test `/me`: no header, `Basic`, garbage token → 401; real token → 200. Commit, add `SUPABASE_URL` + `SUPABASE_ANON_KEY` on Render, test live. Later: Vercel refresh 404 on `/login` (SPA rewrite), Log out (UC03), Reset password (UC04).
+
+### Day 7 — Mon–Wed, 2026-11-09 to 2026-11-11
+
+- **Did:** Fixed `GET /me` to return only `{ profile: { name } }`. Added the `Today` page and Log out (UC03). Added the Vercel SPA rewrite. Wrote `PRODUCT.md`. Built `AuthProvider` + `useAuth` and the `RequireAuth` / `RedirectIfAuthed` route guards, then removed the manual `navigate` calls from Today and Login. Got a code review (no critical issues) and fixed its main point: after logging in, users go back to the page they were trying to open.
+- **Learned:** Context shares one session with the whole app; `createContext(null)` + a `throw` in `useAuth` makes a missing provider fail loudly. Three session states (`undefined` / `null` / `Session`) let the guards wait instead of guessing. `onAuthStateChange` fires `INITIAL_SESSION` on subscribe, so it alone covers refresh, login, logout, token refresh and other tabs; unsubscribe in the effect cleanup. Guards are layout routes with `<Outlet />`. `<Navigate state={...}>` carries a note to the next page; `?.` reads it safely and `??` gives a fallback. Hooks must run before any early `return`.
+- **Stuck on:** Why the redirect "forgot" the intended page. It looked fine because `/today` is the only protected route, so the bug was hidden.
+- **Next:** Landing page on `/` (Ember Evolved + Brand & UI). Then Reset password (UC04; keep its page outside `RedirectIfAuthed`). Remove the "Session:" debug line and the Sign Up / Log In links from `App.tsx`. Set `engines.node` to `>=22` in `server/package.json` (still `>=20`).
 
 <!-- Copy the block below for each new day -->
 <!--

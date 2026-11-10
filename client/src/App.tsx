@@ -1,43 +1,17 @@
-import { useEffect, useState } from "react";
-import { Navigate, Routes, Route, Link } from "react-router";
+import { Routes, Route } from "react-router";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Today from "./pages/Today";
-import { useAuth } from "./auth/useAuth";
 import RequireAuth from "./auth/RequireAuth";
 import RedirectIfAuthed from "./auth/RedirectIfAuthed";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import Landing from "./pages/Landing";
 
 function App() {
-  const [status, setStatus] = useState("checking...");
-  const { session } = useAuth();
-
-  useEffect(() => {
-    fetch(`${API_URL}/health/db`)
-      .then((res) => res.json())
-      .then((data) => setStatus(data.ok ? "connected" : "database error"))
-      .catch((err) => {
-        console.error(err);
-        setStatus("can't reach server");
-      });
-  }, []);
-
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-bold text-blue-600">StreakLy</h1>
-      <p className="mt-4">Server: {status}</p>
-      <p>
-        Session:{" "}
-        {session === undefined
-          ? "checking"
-          : session
-            ? "logged in"
-            : "logged out"}
-      </p>
+    <main>
       <Routes>
-        <Route path="/" element={<Navigate to="/today" replace></Navigate>} />
         <Route element={<RedirectIfAuthed />}>
+          <Route path="/" element={<Landing />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
         </Route>
@@ -45,9 +19,6 @@ function App() {
           <Route path="/today" element={<Today />} />
         </Route>
       </Routes>
-
-      <Link to="/signup">Sign Up</Link>
-      <Link to="/login">Log In</Link>
     </main>
   );
 }

@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@theme {
+  --color-paper: #f1efeb;
+  --color-sheet: #fcfbf9;
+  --color-line: #e3dfd8;
+  --color-line-2: #cfcac2;
+  --color-ink: #1e1b2e;
+  --color-ink-2: #4f4a63;
+  --color-ink-3: #6b6580;
+  --color-ember: #f26b2e;
+  --color-ember-deep: #c2410c;
+  --color-ember-ink: #a8360a;
+  --color-ember-wash: #fdeadf;
+  --color-indigo: #3d4fc4;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
