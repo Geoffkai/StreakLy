@@ -3,11 +3,13 @@ import { Navigate, Routes, Route, Link } from "react-router";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Today from "./pages/Today";
+import { useAuth } from "./auth/useAuth";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [status, setStatus] = useState("checking...");
+  const { session } = useAuth();
 
   useEffect(() => {
     fetch(`${API_URL}/health/db`)
@@ -15,7 +17,7 @@ function App() {
       .then((data) => setStatus(data.ok ? "connected" : "database error"))
       .catch((err) => {
         console.error(err);
-        setStatus("can't reach server ");
+        setStatus("can't reach server");
       });
   }, []);
 
@@ -23,6 +25,14 @@ function App() {
     <main className="p-8">
       <h1 className="text-3xl font-bold text-blue-600">StreakLy</h1>
       <p className="mt-4">Server: {status}</p>
+      <p>
+        Session:{" "}
+        {session === undefined
+          ? "checking"
+          : session
+            ? "logged in"
+            : "logged out"}
+      </p>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace></Navigate>} />
         <Route path="/signup" element={<SignUp />} />
