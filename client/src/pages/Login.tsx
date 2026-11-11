@@ -8,7 +8,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   //This is what happens when the user clicks Login button
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault(); //To prevent the refresh
 
     setLoading(true);
