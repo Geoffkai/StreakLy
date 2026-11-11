@@ -117,7 +117,19 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 
 ### Phase 4.5 — Landing page
 
-- [ ] Client: Landing page on `/` for logged-out visitors (Ember Evolved + StreakLy Brand & UI)
+- [x] Design calls: grey `paper` background (one token, easy to swap), Streak Grid logo, flame only as the in-app streak icon, product visuals instead of photos
+- [x] Design tokens (`@theme` in `index.css`) + Google Fonts (Bricolage Grotesque, Plus Jakarta Sans)
+- [x] Route `/` → `Landing` under `RedirectIfAuthed`; removed the debug header, health check and links from `App.tsx`
+- [x] Logo: `public/logo.svg` (Streak Grid)
+- [x] Nav: logo + How it works · Friends · Log in
+- [x] Hero: headline + description, page capped at 1280px (`max-w-7xl`)
+- [x] Week strip: 7 squares from a `week` array (`.map`), today outlined
+- [x] Streak count (derived from `week`) + email form → `/signup` with `{ email }` in state, SignUp pre-fills it _(written; test the pre-fill)_
+- [ ] Estimate card: "Plan in hours, then see the real time beside it."
+- [ ] Animations: squares fill one by one, count goes up, respects reduced motion
+- [ ] Sections below the hero: How it works (`#how`), Friends (`#friends`), closing CTA, footer _(proposed, not confirmed)_
+- [ ] Phone layout (right now it only fits ≥1280px wide)
+- [ ] Accessibility pass (landmarks, focus, contrast)
 
 ### Phase 5 — First real feature: Manage Subjects → UC05 / FT_5
 
@@ -166,6 +178,8 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 | D10 | 2026-11-10 | Client session comes only from `onAuthStateChange` (no separate `getSession()`), shared through `AuthProvider`         | Subscribing fires `INITIAL_SESSION` right away, then login, logout, token refresh and other tabs. One source means no race between two calls                                         |
 | D11 | 2026-11-11 | Redirects live in the route guards only; pages (Login, Today) never `navigate` after auth changes                      | One place decides where the user goes. Logout in another tab or a "go back to where you were" redirect then works without extra code in each page                                    |
 | D12 | 2026-11-11 | Landing page on `/` combines the Ember Evolved exploration with StreakLy Brand & UI                                    | The direction the user chose                                                                                                                                                         |
+| D13 | 2026-11-11 | Grey `paper` background for now; Streak Grid logo; flame only as the in-app streak icon; no stock photos               | Background is one token, easy to swap. The flame is generic across streak apps; the grid is unique. Photos say nothing about the product                                             |
+| D14 | 2026-11-11 | Landing email form sends the visitor to `/signup` with `{ email }` in router state; browser does the validation        | No mailing list exists, so "check your inbox" would be false. `type="email"` + `required` avoids writing a regex                                                                     |
 
 ---
 
@@ -189,6 +203,14 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Hooks go before any early `return`.** React needs hooks called in the same order every render; a `return null` above `useLocation()` would skip it on some renders.
 - **Don't redirect while the session is still `undefined`.** Supabase hasn't answered yet; guessing "logged out" sends logged-in users to `/login` on every refresh.
 - **Commit new files together with the files that import them.** Untracked files don't show in `git diff`; committing only `App.tsx` would break the build at that commit.
+- **`index.html` is plain HTML, not JSX.** Use `class`, not `className`. The browser ignores attributes it doesn't know.
+- **Tailwind ignores unknown classes without warning.** Typos like `sr-on`, `px3.5` or `hover:shadow-sheet` just do nothing. Check with DevTools → Inspect → Styles.
+- **Tailwind v4: a plain number in `leading-*` is a spacing unit.** `leading-1` = 4px line-height. Line-height 1 is `leading-none`.
+- **An SVG in `<img>` can't see the page's CSS.** No CSS variables, no `currentColor`. Hard-code colors in `public/` files; put icons that follow the text color inline.
+- **`<Navigate>` vs `navigate()`.** The component only works when rendered (guards). In event handlers, use the `useNavigate()` function.
+- **Label router state:** send `{ email }`, not a bare string, and read `location.state?.email ?? ""`. `location.state` is `any`, so TypeScript won't catch a wrong shape.
+- **`<ol>` / `<ul>` may only contain `<li>`.** Anything else confuses screen readers and the grid.
+- **`React.FormEvent` is deprecated** in the current React types. Use `React.SubmitEvent<HTMLFormElement>` for form submits.
 
 ---
 
@@ -203,6 +225,7 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Context / Provider** — a "bulletin board" in React: the Provider pins a value up, any component below reads it (`useAuth()`) without passing props down.
 - **Route guard** — a layout route that checks something (logged in?) and either redirects with `<Navigate>` or shows the page with `<Outlet />`.
 - **Navigate `state`** — a note attached to a redirect; the next page reads it with `useLocation().state`.
+- **Design token** — a named design value (color, font) defined once. In Tailwind v4, `--color-paper` inside `@theme` creates `bg-paper`, `text-paper`, etc.
 
 ---
 
@@ -256,6 +279,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** Context shares one session with the whole app; `createContext(null)` + a `throw` in `useAuth` makes a missing provider fail loudly. Three session states (`undefined` / `null` / `Session`) let the guards wait instead of guessing. `onAuthStateChange` fires `INITIAL_SESSION` on subscribe, so it alone covers refresh, login, logout, token refresh and other tabs; unsubscribe in the effect cleanup. Guards are layout routes with `<Outlet />`. `<Navigate state={...}>` carries a note to the next page; `?.` reads it safely and `??` gives a fallback. Hooks must run before any early `return`.
 - **Stuck on:** Why the redirect "forgot" the intended page. It looked fine because `/today` is the only protected route, so the bug was hidden.
 - **Next:** Landing page on `/` (Ember Evolved + Brand & UI). Then Reset password (UC04; keep its page outside `RedirectIfAuthed`). Remove the "Session:" debug line and the Sign Up / Log In links from `App.tsx`. Set `engines.node` to `>=22` in `server/package.json` (still `>=20`).
+
+### Day 8 — Wed, 2026-11-11
+
+- **Did:** Started the landing page. Picked the design calls (grey background, Streak Grid logo, flame only in-app, no stock photos). Added design tokens and fonts, routed `/` to `Landing` under `RedirectIfAuthed`, and cleaned the debug UI out of `App.tsx`. Built the logo SVG, nav, hero, week strip, streak count and the email form that sends the email to `/signup`. A code review caught that `RequireAuth` was redirecting to `/` (losing the "where were they going" note) and that the state was an unlabeled string; fixed both.
+- **Learned:** Vite turns `import "./index.css"` into a `<style>` in `<head>`, so CSS imported in `main.tsx` styles the whole page, not just `#root`. `index.html` is plain HTML (`class`, not `className`). Tailwind v4 `@theme` tokens become classes; arbitrary values use `[...]` and `_` for spaces. `max-w-7xl mx-auto` caps and centers a page. `items-baseline`, `tabular-nums`, `min-w-0` on flex inputs, `sr-only` labels. `<Navigate>` is for rendering, `useNavigate()` for events. Router state should be a labeled object.
+- **Stuck on:** Why the page looked stretched on a wide screen (no width cap). Several Tailwind typos that failed without any error.
+- **Next:** Commit the form + fixes. Estimate card. Then animations, the How it works / Friends sections, the phone layout, and an accessibility pass. Reset password (UC04) after the landing page.
 
 <!-- Copy the block below for each new day -->
 <!--
