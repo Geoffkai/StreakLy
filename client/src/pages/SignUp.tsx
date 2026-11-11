@@ -1,13 +1,16 @@
 import { useState } from "react";
+import { useLocation } from "react-router";
 import { supabase } from "../lib/supabase";
 
 export default function SignUp() {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const preEmail = location.state?.email ?? "";
+  const [email, setEmail] = useState(preEmail);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setLoading(true);
