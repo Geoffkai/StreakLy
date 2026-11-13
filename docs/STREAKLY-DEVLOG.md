@@ -125,10 +125,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - [x] Hero: headline + description, page capped at 1280px (`max-w-7xl`)
 - [x] Week strip: 7 squares from a `week` array (`.map`), today outlined
 - [x] Streak count (derived from `week`) + email form → `/signup` with `{ email }` in state, SignUp pre-fills it _(written; test the pre-fill)_
-- [ ] Estimate card: "Plan in hours, then see the real time beside it."
-- [ ] Animations: squares fill one by one, count goes up, respects reduced motion
-- [ ] Sections below the hero: How it works (`#how`), Friends (`#friends`), closing CTA, footer _(proposed, not confirmed)_
-- [ ] Phone layout (right now it only fits ≥1280px wide)
+- [x] Estimate card: "Plan in hours, then see the real time beside it." (two bars + legend)
+- [x] Sticky header with an outlined Sign up (the hero's "Start your streak" is the one filled button)
+- [x] Animations: squares fill one by one, durations and caption fade in, off under reduced motion
+- [x] Sections below the hero: How it works (`#how`), Friends (`#friends`, sample feed), night footer. Dropped the FAQ and closing CTA.
+- [x] Phone layout: responsive classes (`clamp()` headline, `minmax` grids, stacked form) _(check on a real phone)_
+- [x] Split into components: `ReactionButton`, `FeedPost`, `Footer`, `sampleWeek.ts` in `components/landing/`; icons from `@phosphor-icons/react`
+- [ ] Motion pass (designed in `design/landing.html`): scroll-driven bars / step squares / feed / footer week, footer night grid, plus pick hero options (A–E)
 - [ ] Accessibility pass (landmarks, focus, contrast)
 
 ### Phase 5 — First real feature: Manage Subjects → UC05 / FT_5
@@ -226,6 +229,9 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Route guard** — a layout route that checks something (logged in?) and either redirects with `<Navigate>` or shows the page with `<Outlet />`.
 - **Navigate `state`** — a note attached to a redirect; the next page reads it with `useLocation().state`.
 - **Design token** — a named design value (color, font) defined once. In Tailwind v4, `--color-paper` inside `@theme` creates `bg-paper`, `text-paper`, etc.
+- **Props** — the inputs a component receives, like function arguments. `{...r}` (spread) passes every field of an object as props.
+- **`key`** — a unique id React needs on each element a `.map()` returns, so it can tell list items apart between renders.
+- **Scroll-driven animation** — CSS `animation-timeline: view()`: the animation's progress follows the element's position on screen instead of a clock, so it plays as you scroll and reverses when you scroll back.
 
 ---
 
@@ -286,6 +292,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** Vite turns `import "./index.css"` into a `<style>` in `<head>`, so CSS imported in `main.tsx` styles the whole page, not just `#root`. `index.html` is plain HTML (`class`, not `className`). Tailwind v4 `@theme` tokens become classes; arbitrary values use `[...]` and `_` for spaces. `max-w-7xl mx-auto` caps and centers a page. `items-baseline`, `tabular-nums`, `min-w-0` on flex inputs, `sr-only` labels. `<Navigate>` is for rendering, `useNavigate()` for events. Router state should be a labeled object.
 - **Stuck on:** Why the page looked stretched on a wide screen (no width cap). Several Tailwind typos that failed without any error.
 - **Next:** Commit the form + fixes. Estimate card. Then animations, the How it works / Friends sections, the phone layout, and an accessibility pass. Reset password (UC04) after the landing page.
+
+### Day 9 — Thu–Sat, 2026-11-12 to 2026-11-14
+
+- **Did:** Finished the landing page build (steps 0–7): night tokens and base rules, sticky header, responsive hero, estimate band with a second bar and legend, How it works with step markers and a video slot, Friends with a sample feed, night footer, and the squares filling one by one on load. Refactored the feed into `ReactionButton` and `FeedPost` driven by a `posts` array, swapped pasted SVGs for `@phosphor-icons/react`, and split the components into `components/landing/` with a shared `sampleWeek.ts`. Then designed a motion pass in `design/landing.html` (scroll-driven sections, a twinkling night grid in the footer, five hero options to choose from).
+- **Learned:** Phone-first Tailwind (unprefixed = phone, `lg:` adds desktop), `clamp()`, `minmax(0, …)`, `aspect-square`, `rounded-[24%]`. `absolute` positions against the nearest `relative` ancestor (a missing `relative` gave a full-screen orange block). `{cond && <X/>}` renders only when true; `{0 && …}` prints "0". `aria-label` takes text, `aria-labelledby` takes an id, and `aria-hidden` must never go on something people interact with. Components and props, `key` on whatever `.map()` returns, spreading props, default vs named exports, `../` import paths. A page file that exports a constant breaks Vite's Fast Refresh, so shared data gets its own `.ts` file (which also removed a circular import). Inline `style` for per-item values like animation delays. `git commit --amend` is only safe before pushing.
+- **Stuck on:** Many silent Tailwind typos (`gap3.5`, `shrink 0`, `order-line-2`) and misspelled ARIA attributes, which fail without any error. A missing `https://` on the LinkedIn link. Scroll animations froze under `overflow-hidden` (it turns the element into a scroll container); `overflow-clip` fixes it.
+- **Next:** Pick the hero motion options and build the motion pass from `design/landing.html`. Fix the estimate legend (the "Estimate" label slipped into the second `<li>`) and the stray "/" in the video badge. Then the accessibility pass, then Reset password (UC04).
 
 <!-- Copy the block below for each new day -->
 <!--
