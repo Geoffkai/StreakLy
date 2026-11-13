@@ -359,12 +359,14 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* Friends Section */}
         <section
           id="friends"
           aria-labelledby="fr-h"
           className="scroll-mt-20 border-y border-line bg-sheet"
         >
           <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:items-center lg:gap-16 lg:px-18 lg:py-28">
+            {/* Left side of friends (A few friends. No leaderboard.) */}
             <div>
               <h2
                 id="fr-h"
@@ -400,6 +402,218 @@ export default function Landing() {
                 </li>
               </ul>
             </div>
+
+            {/* The Friends Page */}
+            <figure className="rounded-[28px] bg-paper p-3 sm:p-4">
+              {/* Caption */}
+              <figcaption className="px-2 pt-1 pb-3 text-[13px] font-semibold text-ink-3">
+                Sample feed. Names are made up.
+              </figcaption>
+              <ul className="divide-y divide-line rounded-[20px] border border-line bg-sheet">
+                {/* Bea Santos */}
+                <li className="p-4">
+                  <div className="flex items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className={`grid size-10.5 shrink-0 place-items-center rounded-xl text-sm font-extrabold bg-ember-wash text-ember-ink`}
+                    >
+                      BS
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <b className="block text-[15px]">Bea Santos</b>
+                      <span className="text-[13px] font-medium text-ink-3">
+                        2h ago
+                      </span>
+                    </div>
+                    <span className="inline-flex shrink 0 items-center gap-1.5 text-[12.5px] font-bold text-ink-2">
+                      <img src="/logo.svg" alt="" className="size-4" />
+                      12-day streak
+                    </span>
+                  </div>
+                  <p className="mt-2.5 text-[14.5px] text-ink-2">
+                    Studied <b className="text-ink">Eigenvalues</b> in Linear
+                    Algebra for <b className="text-ink">1h 10m</b>
+                  </p>
+
+                  {/* Photo Slot */}
+                  <div className="mt-3 grid aspect-16/10 place-items-center rounded-[14px] border-[1.5px] border-dashed border-line-2 bg-paper">
+                    <div className="flex flex-col items-center gap-1.5 text-ink-3">
+                      <svg
+                        viewBox="0 0 256 256"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className="size-7"
+                      >
+                        <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V158.75l-26.07-26.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L40,149.37V56ZM40,172l52-52,80,80H40Zm176,28H194.63l-36-36,20-20L216,181.38V200ZM144,100a12,12,0,1,1,12,12A12,12,0,0,1,144,100Z" />
+                      </svg>
+
+                      <span className="text-[13px] font-bold">
+                        Proof photo slot
+                      </span>
+                      <span className="text-xs font-medium">
+                        Optional, added after a session
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* reaction buttons */}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {/* Fire */}
+                    <button
+                      type="button"
+                      aria-pressed="true"
+                      aria-label="Fire, 3 reactions, you reacted"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-transparent bg-line px-3 text-sm font-bold"
+                    >
+                      <svg
+                        viewBox="0 0 256 256"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className="size-4.5 text-ember-deep"
+                      >
+                        <path d="M143.38,17.85a8,8,0,0,0-12.63,3.41l-22,60.41L84.59,58.26a8,8,0,0,0-11.93.89C51,87.530,40,116.08,40,144a88,88,0,0,0,176,0C216,84.550,165.21,36,143.38,17.85Zm40.51,135.49a57.6,57.6,0,0,1-46.56,46.55A7.65,7.65,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68Z" />
+                      </svg>
+                      3
+                    </button>
+
+                    {/* Clapping Hands */}
+                    <button
+                      type="button"
+                      aria-pressed="false"
+                      aria-label="Clap, 2 reactions"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-line-2 px-3 text-sm font-bold hover:bg-paper"
+                    >
+                      <svg
+                        viewBox="0 0 256 256"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className="size-4.5"
+                      >
+                        <path d="M160.22,24V8a8,8,0,0,1,16,0V24a8,8,0,0,1-16,0ZM196.1,41a7.91,7.91,0,0,0,4.17,1.17,8,8,0,0,0,6.84-3.83l8-13.11a8,8,0,0,0-13.68-8.33l-8,13.1A8,8,0,0,0,196.1,41Zm47.51,12.59a8,8,0,0,0-10.08-5.16l-15.06,4.85a8,8,0,0,0,2.46,15.62,8.15,8.15,0,0,0,2.46-.39l15.05-4.85A8,8,0,0,0,243.61,53.55ZM217,97.58a80.22,80.22,0,0,1-10.22,94c-.34,1.73-.72,3.46-1.19,5.18A80.17,80.17,0,0,1,58.77,216L23.5,155a26,26,0,0,1,19.24-38.79l-3-5.2a26,26,0,0,1,19.2-38.78L58.24,71A26,26,0,0,1,95.470,36.53,26.06,26.06,0,0,1,140.3,37l12.26,21.2A26.07,26.07,0,0,1,195.81,61ZM109.07,55l0,0h0l25,43.17a26,26,0,0,1,17.33-10L126.42,45a10,10,0,1,0-17.35,10ZM72.12,63l6.46,11.17a26.05,26.05,0,0,1,17.32-10L89.45,53A10,10,0,1,0,72.12,63Zm111.54,81-20.22-35a10,10,0,0,0-17.74,9.25L158.3,140a8,8,0,0,1-13.87,8l-36.5-63A10,10,0,1,0,90.58,95l26.05,45a8,8,0,0,1-13.87,8L71,93h0l0,0a10,10,0,0,0-17.33,10l35.22,61A8,8,0,0,1,75,172L54.72,137a10,10,0,0,0-17.34,10l35.27,61a64.12,64.12,0,0,0,117.42-15.44A63.52,63.52,0,0,0,183.66,144Zm19.410-38.42L181.930,69A10,10,0,0,0,164.55,79l33,57.05A80.2,80.2,0,0,1,207,161.51,64.230,64.230,0,0,0,203.07,105.58Z" />
+                      </svg>
+                      2
+                    </button>
+
+                    <button
+                      type="button"
+                      aria-pressed="false"
+                      aria-label="Heart, no reactions"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-line-2 px-3 text-sm font-bold hover:bg-paper"
+                    >
+                      <svg
+                        viewBox="0 0 256 256"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className="size-4.5"
+                      >
+                        <path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z" />
+                      </svg>
+                    </button>
+                  </div>
+                </li>
+
+                {/* Asher Abesia Example */}
+                <li className="p-4">
+                  <div className="flex items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className={`grid size-10.5 shrink-0 place-items-center rounded-xl text-sm font-extrabold bg-ink-2 text-line`}
+                    >
+                      AA
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <b className="block text-[15px]">Asher Abesia</b>
+                      <span className="text-[13px] font-medium text-ink-3">
+                        5h ago
+                      </span>
+                    </div>
+                    <span className="inline-flex shrink 0 items-center gap-1.5 text-[12.5px] font-bold text-ink-2">
+                      <img src="/logo.svg" alt="" className="size-4" />
+                      4-day streak
+                    </span>
+                  </div>
+                  <p className="mt-2.5 text-[14.5px] text-ink-2">
+                    Studied{" "}
+                    <b className="text-ink">
+                      Integrals of Trigonometric Function
+                    </b>{" "}
+                    in Calculus II for <b className="text-ink">2h 45m</b>
+                  </p>
+
+                  {/* reaction buttons */}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {/* Fire */}
+                    <button
+                      type="button"
+                      aria-pressed="true"
+                      aria-label="Fire, 3 reactions, you reacted"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-line-2 px-3 text-sm font-bold hover:bg-paper"
+                    >
+                      <svg
+                        viewBox="0 0 256 256"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className="size-4.5"
+                      >
+                        <path d="M183.89,153.34a57.6,57.6,0,0,1-46.56,46.55A8.75,8.75,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68ZM216,144a88,88,0,0,1-176,0c0-27.92,11-56.47,32.66-84.85a8,8,0,0,1,11.930-.89l24.12,23.41,22-60.41a8,8,0,0,1,12.63-3.41C165.21,36,216,84.55,216,144Zm-16,0c0-46.09-35.79-85.92-58.21-106.33L119.52,98.74a8,8,0,0,1-13.09,3L80.06,76.16C64.09,99.21,56,122,56,144a72,72,0,0,0,144,0Z" />
+                      </svg>
+                      1
+                    </button>
+
+                    {/* Clapping Hands */}
+                    <button
+                      type="button"
+                      aria-pressed="false"
+                      aria-label="Clap, 2 reactions"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-transparent bg-line px-3 text-sm font-bold"
+                    >
+                      <svg
+                        viewBox="0 0 256 256"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className="size-4.5 text-ember-deep"
+                      >
+                        <path d="M188.87,65A18,18,0,0,0,157.62,83L133.36,41a18,18,0,0,0-31.22,18L96.4,49A18,18,0,0,0,65.18,67l3.34,5.77A26,26,0,0,0,39.74,111l3,5.2A26,26,0,0,0,23.5,155l35.27,61a80.14,80.14,0,0,0,149.52-39.57A71.92,71.92,0,0,0,210,101.58Zm1.2,127.56A64.12,64.12,0,0,1,72.65,208L37.38,147a10,10,0,0,1,17.34-10L75,172a8,8,0,0,0,13.87-8L53.62,103A10,10,0,0,1,71,93l31.81,55a8,8,0,0,0,13.87-8l-26-45a10,10,0,0,1,17.35-10l36.5,63a8,8,0,0,0,13.87-8l-12.6-21.75A10,10,0,0,1,163.44,109l20.22,35A63.52,63.52,0,0,1,190.07,192.57ZM160.22,24V8a8,8,0,0,1,16,0V24a8,8,0,0,1-16,0Zm33.22,6,8-13.1a8,8,0,0,1,13.68,8.33l-8,13.11a8,8,0,0,1-6.84,3.83A8,8,0,0,1,193.44,30Zm45,33.66-15.05,4.85a8.15,8.15,0,0,1-2.46.39,8,8,0,0,1-2.46-15.62l15.06-4.85a8,8,0,1,1,4.910,15.23Z" />
+                      </svg>
+                      2
+                    </button>
+
+                    <button
+                      type="button"
+                      aria-pressed="false"
+                      aria-label="Heart, no reactions"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-line-2 px-3 text-sm font-bold hover:bg-paper"
+                    >
+                      <svg
+                        viewBox="0 0 256 256"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className="size-4.5"
+                      >
+                        <path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z" />
+                      </svg>
+                    </button>
+                  </div>
+                </li>
+
+                <li className="flex items-center gap-3 p-4">
+                  <span
+                    aria-hidden="true"
+                    className="grid size-10.5 shrink-0 place-items-center rounded-xl bg-indigo-wash text-sm font-extrabold text-indigo"
+                  >
+                    MR
+                  </span>
+                  <p className="min-w-0 flex-1 text-[14.5px] text-ink-2">
+                    <b className="text-ink">Mika Reyes</b> studied{" "}
+                    <b className="text-ink">Limits</b> for{" "}
+                    <b className="text-ink">20m</b>
+                  </p>
+                  <span className="shrink-0 text-[13px] font-medium text-ink-3">
+                    Just now
+                  </span>
+                </li>
+              </ul>
+            </figure>
           </div>
         </section>
       </main>
