@@ -46,6 +46,32 @@
       transform: none;
     }
   }
+
+  /* today's square: a ring that grows and fades, then waits, on repeat */
+  --animate-today-pulse: today-pulse 2.8s ease-out infinite;
+  @keyframes today-pulse {
+    0% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(1.22);
+    }
+  }
+
+  /* footer grid: a square slowly lights up, then goes dark again */
+  --animate-twinkle: twinkle 8s ease-in-out infinite;
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0;
+    } /* dark at start and end*/
+    50% {
+      opacity: var(--twinkle-peak, 0.55);
+    } /* brightest in the middle */
+  }
 }
 
 @layer base {
@@ -86,5 +112,54 @@
     --mk-off: var(--color-night-3);
     --mk-lit: var(--color-ember-night);
     --mk-today: var(--color-ember-night);
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+
+@keyframes draw-x {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@utility scroll-fill {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: fill-up linear both;
+
+      animation-timeline: view();
+      animation-range: var(--range, cover 5% cover 40%);
+      /* start when the element is 60px into the screen, finish at 220px.
+      --range lets one element override this, like the twinkle peak above */
+    }
+  }
+}
+
+@utility scroll-draw {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: draw-x linear both;
+      animation-timeline: view();
+      animation-range: var(--range, cover 5% cover 40%);
+    }
+  }
+}
+
+@utility scroll-reveal {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: var(--range, cover 0% cover 30%);
+    }
   }
 }

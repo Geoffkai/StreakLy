@@ -257,9 +257,9 @@ export default function Landing() {
                   {/* estimate: dashed outline */}
                   <span className="absolute inset-y-0 left-0 w-3/5 rounded-[3px] border-[1.5px] border-dashed border-indigo" />
                   {/* actual time, up to the estimate */}
-                  <span className="absolute inset-y-0 left-0 w-3/5 rounded-[3px] bg-ink-2" />
+                  <span className="scroll-draw absolute inset-y-0 left-0 w-3/5 rounded-[3px] bg-ink-2" />
                   {/* overrun: striped, starts where the estimate ends */}
-                  <span className="absolute inset-y-0 left-3/5 w-2/5 rounded-r-[3px] border-[1.5px] border-l-0 border-ink-2 bg-[repeating-linear-gradient(135deg,var(--color-ink-2)_0_2px,transparent_2px_5px)]" />
+                  <span className="scroll-draw [--range:cover_40%_cover_55%] absolute inset-y-0 left-3/5 w-2/5 rounded-r-[3px] border-[1.5px] border-l-0 border-ink-2 bg-[repeating-linear-gradient(135deg,var(--color-ink-2)_0_2px,transparent_2px_5px)]" />
                 </div>
               </div>
 
@@ -275,7 +275,7 @@ export default function Landing() {
                   className="relative mt-3 h-3.5"
                 >
                   <span className="absolute inset-0 rounded-[3px] border-[1.5px] border-dashed border-indigo" />
-                  <span className="absolute inset-y-0 left-0 w-[28%] rounded-[3px] bg-ink-2" />
+                  <span className="scroll-draw absolute inset-y-0 left-0 w-[28%] rounded-[3px] bg-ink-2" />
                 </div>
               </div>
 
