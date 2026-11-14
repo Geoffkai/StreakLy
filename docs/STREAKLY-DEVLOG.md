@@ -214,6 +214,12 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Label router state:** send `{ email }`, not a bare string, and read `location.state?.email ?? ""`. `location.state` is `any`, so TypeScript won't catch a wrong shape.
 - **`<ol>` / `<ul>` may only contain `<li>`.** Anything else confuses screen readers and the grid.
 - **`React.FormEvent` is deprecated** in the current React types. Use `React.SubmitEvent<HTMLFormElement>` for form submits.
+- **`overflow-hidden` freezes scroll-driven animations.** It turns the element into a scroll container, so `view()` follows it instead of the page. Use `overflow-clip`.
+- **A keyframe that ends at `clip-path: none` snaps instead of animating.** Give it an explicit `to { clip-path: inset(0); }`. Opacity and transform don't need this.
+- **Scroll animations at the bottom of the page need pixel ranges.** The page can't scroll past the footer, so a percentage end point might never be reached.
+- **A CSS duration or delay needs a unit.** `"2400"` is thrown away; `"2400ms"` works.
+- **`motion-reduce:animate-none` freezes; `motion-reduce:hidden` removes.** Remove anything that would read as data when frozen (like the half-filled session tide).
+- **Check which module auto-import picked.** `Fragment` comes from `"react"`, not `"react/jsx-runtime"`.
 
 ---
 
@@ -232,6 +238,10 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Props** — the inputs a component receives, like function arguments. `{...r}` (spread) passes every field of an object as props.
 - **`key`** — a unique id React needs on each element a `.map()` returns, so it can tell list items apart between renders.
 - **Scroll-driven animation** — CSS `animation-timeline: view()`: the animation's progress follows the element's position on screen instead of a clock, so it plays as you scroll and reverses when you scroll back.
+- **`@property`** — registers a CSS variable with a type (like `<integer>`), so the browser can animate it instead of jumping between values.
+- **Fragment** — `<Fragment>` / `<>` groups several elements without adding a wrapper to the page. Use the long form when it needs a `key`.
+- **Derived state** — a value computed from state you already have (like the shown reaction count from `isPressed`), instead of a second piece of state to keep in sync.
+- **Landmark** — a region screen readers can jump to: `<header>`, `<nav>`, `<main>`, `<footer>`. One `<main>` per page.
 
 ---
 
@@ -299,6 +309,13 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** Phone-first Tailwind (unprefixed = phone, `lg:` adds desktop), `clamp()`, `minmax(0, …)`, `aspect-square`, `rounded-[24%]`. `absolute` positions against the nearest `relative` ancestor (a missing `relative` gave a full-screen orange block). `{cond && <X/>}` renders only when true; `{0 && …}` prints "0". `aria-label` takes text, `aria-labelledby` takes an id, and `aria-hidden` must never go on something people interact with. Components and props, `key` on whatever `.map()` returns, spreading props, default vs named exports, `../` import paths. A page file that exports a constant breaks Vite's Fast Refresh, so shared data gets its own `.ts` file (which also removed a circular import). Inline `style` for per-item values like animation delays. `git commit --amend` is only safe before pushing.
 - **Stuck on:** Many silent Tailwind typos (`gap3.5`, `shrink 0`, `order-line-2`) and misspelled ARIA attributes, which fail without any error. A missing `https://` on the LinkedIn link. Scroll animations froze under `overflow-hidden` (it turns the element into a scroll container); `overflow-clip` fixes it.
 - **Next:** Pick the hero motion options and build the motion pass from `design/landing.html`. Fix the estimate legend (the "Estimate" label slipped into the second `<li>`) and the stray "/" in the video badge. Then the accessibility pass, then Reset password (UC04).
+
+### Day 10 — Sat–Sun, 2026-11-14 to 2026-11-15
+
+- **Did:** Fixed the estimate legend and the video badge. Built the motion pass: estimate bars draw on scroll, feed posts rise in, the footer week fills square by square with today pulsing under a twinkling night grid, and all five hero options (headline words rise, the "6" counts up, today's pulse ring and session tide, a daytime grid behind the headline). Kept the How it works markers static because the video already explains that section. Split `Landing.tsx` (~540 lines) into `Header`, `Hero`, `EstimateBand`, `HowItWorks` and `Friends`, so it's now 21 lines. Ran an accessibility audit and fixed the nested `<main>`, the "client" page title, the low-contrast email border and the reaction buttons, which now actually toggle.
+- **Learned:** `@keyframes` is the script; `--animate-*` in `@theme` and `@utility` turn it into a class. `animation-timeline: view()` runs an animation on the scroll instead of a clock, and `animation-range` sets where it starts and ends. Guard motion with `@media (prefers-reduced-motion)` and `@supports` so everyone still sees the finished state. The browser can only blend between values of the same kind: `inset()` to `none` snaps halfway, so `draw-x` needed an explicit `to`. Pixel ranges finish in one or two wheel notches; `cover` percentages scale with the screen. `@property` makes a CSS variable a real integer so it can count, and a CSS counter prints it. A `.map()` that returns two siblings needs a `<Fragment key>` (the `<>` shorthand can't take a key). Spaces between inline-blocks go outside them as `{" "}`. Data moves into the component that uses it, so the sections need no props. Each page owns its own `<main>`. Derive state instead of duplicating it: store only `isPressed` and compute the count. The label says what a button is; `aria-pressed` says whether it's on.
+- **Stuck on:** Scroll fills that jumped from empty to full: the range was too short, and then the keyframe ended at `none`. Thinking the footer wasn't animating when it was, because it all happens at the very bottom of the page. A `.map()` returning a span plus a space (`')' expected`). Auto-import picking `react/jsx-runtime` instead of `react` for `Fragment`. A count formula that showed 4 on load for reactions that started pressed.
+- **Next:** Reset password (UC04), with its page outside `RedirectIfAuthed`. Hook up the How it works video when it's ready (the play button is a placeholder until then). I decided not to add a WCAG 2.2.2 pause control: the loops are small and decorative, and reduced motion already stops them. Still open from Day 7: set `engines.node` to `>=22` in `server/package.json`.
 
 <!-- Copy the block below for each new day -->
 <!--
