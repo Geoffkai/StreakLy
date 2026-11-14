@@ -170,7 +170,7 @@ export default function Hero() {
               required
               autoComplete="email"
               placeholder="you@school.edu.ph"
-              className="min-h-13 min-w-0 flex-1 rounded-xl border-[1.5px] border-line-2 bg-sheet px-3.5 text-base font-medium text-ink placeholder:text-ink-3 focus:border-ember-deep focus:outline-hidden focus:ring-3 focus:ring-ember-wash"
+              className="min-h-13 min-w-0 flex-1 rounded-xl border-[1.5px] border-ink-2 bg-sheet px-3.5 text-base font-medium text-ink placeholder:text-ink-3 focus:border-ember-deep focus:outline-hidden focus:ring-3 focus:ring-ember-wash"
             />
             <button
               type="submit"

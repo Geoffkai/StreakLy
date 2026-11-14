@@ -31,30 +31,32 @@ export default function SignUp() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Enter your Email</label>
-      <input
-        id="email"
-        type="email"
-        onChange={(event) => setEmail(event.target.value)}
-        value={email}
-        required
-        autoComplete="email"
-      />
-      <label htmlFor="password">Enter your Password</label>
-      <input
-        id="password"
-        type="password"
-        onChange={(event) => setPassword(event.target.value)}
-        value={password}
-        required
-        autoComplete="new-password"
-        minLength={6}
-      />
-      <button type="submit" disabled={loading}>
-        {loading ? "Creating Account" : "Sign Up"}
-      </button>
-      {message && <p role="alert">{message}</p>}
-    </form>
+    <main>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="email">Enter your Email</label>
+        <input
+          id="email"
+          type="email"
+          onChange={(event) => setEmail(event.target.value)}
+          value={email}
+          required
+          autoComplete="email"
+        />
+        <label htmlFor="password">Enter your Password</label>
+        <input
+          id="password"
+          type="password"
+          onChange={(event) => setPassword(event.target.value)}
+          value={password}
+          required
+          autoComplete="new-password"
+          minLength={6}
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Creating Account" : "Sign Up"}
+        </button>
+        {message && <p role="alert">{message}</p>}
+      </form>
+    </main>
   );
 }

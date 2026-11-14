@@ -23,12 +23,12 @@ export default function Today() {
     }
   }
   return (
-    <>
+    <main>
       <h1>Today</h1>
       <button type="button" onClick={handleLogout} disabled={loading}>
         {loading ? "Logging Out" : "Log Out"}
       </button>
       {message && <p>{message}</p>}
-    </>
+    </main>
   );
 }

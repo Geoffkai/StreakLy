@@ -8,18 +8,16 @@ import Landing from "./pages/Landing";
 
 function App() {
   return (
-    <main>
-      <Routes>
-        <Route element={<RedirectIfAuthed />}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Login />} />
-        </Route>
-        <Route element={<RequireAuth />}>
-          <Route path="/today" element={<Today />} />
-        </Route>
-      </Routes>
-    </main>
+    <Routes>
+      <Route element={<RedirectIfAuthed />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+      </Route>
+      <Route element={<RequireAuth />}>
+        <Route path="/today" element={<Today />} />
+      </Route>
+    </Routes>
   );
 }
 

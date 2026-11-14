@@ -30,29 +30,31 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Enter your Email</label>
-      <input
-        id="email"
-        type="email"
-        onChange={(event) => setEmail(event.target.value)}
-        value={email}
-        required
-        autoComplete="email"
-      />
-      <label htmlFor="password">Enter your Password</label>
-      <input
-        id="password"
-        type="password"
-        onChange={(event) => setPassword(event.target.value)}
-        value={password}
-        autoComplete="current-password"
-        required
-      />
-      <button type="submit" disabled={loading}>
-        {loading ? "Logging In" : "Log In"}
-      </button>
-      {message && <p role="alert">{message}</p>}
-    </form>
+    <main>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="email">Enter your Email</label>
+        <input
+          id="email"
+          type="email"
+          onChange={(event) => setEmail(event.target.value)}
+          value={email}
+          required
+          autoComplete="email"
+        />
+        <label htmlFor="password">Enter your Password</label>
+        <input
+          id="password"
+          type="password"
+          onChange={(event) => setPassword(event.target.value)}
+          value={password}
+          autoComplete="current-password"
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging In" : "Log In"}
+        </button>
+        {message && <p role="alert">{message}</p>}
+      </form>
+    </main>
   );
 }
