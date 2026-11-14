@@ -286,9 +286,9 @@ export default function Landing() {
                     aria-hidden="true"
                     className="h-2.5 w-5 rounded-xs border-[1.5px] border-dashed border-indigo"
                   />
+                  Estimate
                 </li>
                 <li className="inline-flex items-center gap-2">
-                  Estimate
                   <span
                     aria-hidden="true"
                     className="h-2.5 w-5 rounded-xs bg-ink-2"
@@ -385,7 +385,7 @@ export default function Landing() {
                     </svg>
                   </button>
                   <span className="absolute bottom-6 left-6 rounded-lg bg-night-2 px-2.5 py-1 text-[13px] font-bold text-moon tabular-nums">
-                    Video slot · 16:9 /
+                    Video slot · 16:9
                   </span>
                 </div>
                 <figcaption className="mt-3 text-sm font-semibold text-ink-3">
