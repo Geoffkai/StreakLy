@@ -10,6 +10,12 @@ import Footer from "../components/landing/Footer";
 import { week } from "../components/landing/sampleWeek";
 import { Fragment } from "react";
 
+type DaySquare = {
+  top: string;
+  left: string;
+  delay: string;
+};
+
 const posts: Post[] = [
   {
     avatarTint: "bg-ember-wash text-ember-ink",
@@ -43,6 +49,14 @@ const posts: Post[] = [
       { icon: HeartIcon, name: "Heart", count: 0, pressed: false },
     ],
   },
+];
+
+const daySquares: DaySquare[] = [
+  { top: "40px", left: "40px", delay: "2.4s" },
+  { top: "112px", left: "148px", delay: "5s" },
+  { top: "4px", left: "220px", delay: "3.6s" },
+  { top: "184px", left: "76px", delay: "6.4s" },
+  { top: "76px", left: "328px", delay: "8.2s" },
 ];
 
 export default function Landing() {
@@ -106,8 +120,24 @@ export default function Landing() {
         {/* Hero section */}
         <section
           aria-labelledby="hero-h"
-          className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-18"
+          className="relative isolate mx-auto max-w-7xl px-4 sm:px-8 lg:px-18"
         >
+          <div
+            aria-hidden="true"
+            className="bg-streak-grid-day pointer-events-none absolute top-0 left-0 -z-10 hidden h-80 w-full mask-intersect mask-[linear-gradient(to_right,#000,transparent_50%),linear-gradient(to_bottom,#000_30%,transparent)] [--twinkle-peak:0.4] sm:block"
+          >
+            {daySquares.map((square, i) => (
+              <span
+                key={i}
+                className="absolute size-7 rounded-[7px] bg-ember opacity-0 animate-twinkle motion-reduce:animate-none"
+                style={{
+                  top: square.top,
+                  left: square.left,
+                  animationDelay: square.delay,
+                }}
+              />
+            ))}
+          </div>
           <div className="grid gap-5 pt-6 lg:grid-cols-[1.45fr_1fr] lg:items-end lg:gap-16 lg:pt-9">
             <h1
               id="hero-h"

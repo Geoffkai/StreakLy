@@ -1,13 +1,13 @@
 import { week } from "./sampleWeek";
 import { BrowsersIcon, LinkedinLogoIcon } from "@phosphor-icons/react";
 
-type Square = {
+type NightSquare = {
   top: string;
   right: string;
   delay: string;
 };
 
-const squares: Square[] = [
+const squares: NightSquare[] = [
   { top: "4px", right: "40px", delay: "0s" },
   { top: "40px", right: "112px", delay: "2.6s" },
   { top: "76px", right: "4px", delay: "5.1s" },
