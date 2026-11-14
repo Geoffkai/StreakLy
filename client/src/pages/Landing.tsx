@@ -8,6 +8,7 @@ import {
 import FeedPost, { type Post } from "../components/landing/FeedPost";
 import Footer from "../components/landing/Footer";
 import { week } from "../components/landing/sampleWeek";
+import { Fragment } from "react";
 
 const posts: Post[] = [
   {
@@ -46,6 +47,7 @@ const posts: Post[] = [
 
 export default function Landing() {
   const navigate = useNavigate();
+  const streak = week.filter((d) => !d.isToday).length;
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,6 +58,7 @@ export default function Landing() {
       state: { email },
     });
   }
+
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-line bg-paper">
@@ -110,7 +113,16 @@ export default function Landing() {
               id="hero-h"
               className="font-display text-[clamp(3rem,9vw,5.75rem)] font-extrabold tracking-[-0.035em] leading-[0.93] text-balance"
             >
-              Every day you show up counts.
+              {"Every day you show up counts.".split(" ").map((word, i) => (
+                <Fragment key={i}>
+                  <span
+                    style={{ animationDelay: `${i * 70}ms` }}
+                    className="inline-block animate-word-rise motion-reduce:animate-none"
+                  >
+                    {word}
+                  </span>{" "}
+                </Fragment>
+              ))}
             </h1>
 
             <p className="lg:mb-5 text-lg leading-normal text-ink-2">
@@ -131,10 +143,24 @@ export default function Landing() {
                 className="flex flex-col items-start gap-2 sm:gap-2.5"
               >
                 <div
-                  className={`aspect-square w-full rounded-[24%] border-2
-                  ${d.isToday ? "border-ink" : " relative border-dashed border-line-2"}`}
+                  className={`aspect-square w-full rounded-[24%] border-2 relative 
+                  ${d.isToday ? "border-ink" : "border-dashed border-line-2"}`}
                 >
-                  {!d.isToday && (
+                  {d.isToday ? (
+                    <>
+                      {/* pulse ring */}
+                      <span
+                        style={{ animationDelay: `2400ms` }}
+                        className="absolute -inset-0.5 rounded-[inherit] border-2 border-ember opacity-0 animate-today-pulse motion-reduce:animate-none"
+                      />
+
+                      {/* session tide */}
+                      <span
+                        style={{ animationDelay: "2400ms" }}
+                        className="absolute inset-0 rounded-[20%] bg-ember/30 animate-session-tide motion-reduce:hidden"
+                      />
+                    </>
+                  ) : (
                     <span
                       style={{ animationDelay: `${i * 260 + 250}ms` }}
                       className="absolute -inset-0.5 rounded-[inherit] bg-ember animate-fill-up motion-reduce:animate-none"
@@ -166,9 +192,13 @@ export default function Landing() {
             {/* Left: streak count + caption */}
             <div className="flex flex-col">
               <div className="flex items-baseline gap-2.5">
-                <b className="font-display text-[56px] font-extrabold leading-[0.9] tracking-[-0.035em] tabular-nums">
-                  {week.filter((d) => !d.isToday).length}
-                </b>
+                {/* visible number is drawn by CSS (streak-count); screen readers get the sr-only one */}
+                <b
+                  aria-hidden="true"
+                  style={{ "--to": streak } as React.CSSProperties}
+                  className="streak-count font-display text-[56px] font-extrabold leading-[0.9] tracking-[-0.035em] tabular-nums"
+                />
+                <span className="sr-only">{streak}</span>
                 <span className="text-[15px] font-[650] text-ink-2">
                   day streak
                 </span>
@@ -453,7 +483,7 @@ export default function Landing() {
                 ))}
 
                 {/* Mika Reyes example */}
-                <li className="flex items-center gap-3 p-4">
+                <li className="flex items-center gap-3 p-4 scroll-reveal">
                   <span
                     aria-hidden="true"
                     className="grid size-10.5 shrink-0 place-items-center rounded-xl bg-indigo-wash text-sm font-extrabold text-indigo"

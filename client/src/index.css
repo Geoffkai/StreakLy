@@ -72,6 +72,52 @@
       opacity: var(--twinkle-peak, 0.55);
     } /* brightest in the middle */
   }
+
+  --animate-session-tide: session-tide 7s ease-in-out infinite;
+  @keyframes session-tide {
+    0%,
+    100% {
+      clip-path: inset(100% 0 0 0);
+    }
+    50% {
+      clip-path: inset(62% 0 0 0);
+    }
+  }
+
+  --animate-word-rise: word-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  @keyframes word-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.35em);
+    }
+  }
+}
+
+/* registers --streak as an animatable integer */
+@property --streak {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes count-up {
+  to {
+    --streak: var(--to, 6);
+  }
+}
+
+@utility streak-count {
+  counter-reset: streak var(--streak);
+  /* 6 ticks x 260ms; starts 260ms before Mon finishes (250 + 500 - 260 = 490ms),
+     so each number lands as its square finishes filling */
+  animation: count-up 1560ms steps(6, end) 490ms both;
+  &::after {
+    content: counter(streak);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    --streak: var(--to, 6); /* no counting: just show the final number */
+  }
 }
 
 @layer base {
@@ -162,4 +208,10 @@
       animation-range: var(--range, cover 0% cover 30%);
     }
   }
+}
+
+@utility bg-streak-grid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Crect x='4' y='4' width='28' height='28' rx='7' fill='%2324203d'/%3E%3C/svg%3E");
+  background-size: 36px 36px;
+  background-position: top right;
 }

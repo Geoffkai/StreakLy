@@ -1,16 +1,61 @@
 import { week } from "./sampleWeek";
 import { BrowsersIcon, LinkedinLogoIcon } from "@phosphor-icons/react";
 
+type Square = {
+  top: string;
+  right: string;
+  delay: string;
+};
+
+const squares: Square[] = [
+  { top: "4px", right: "40px", delay: "0s" },
+  { top: "40px", right: "112px", delay: "2.6s" },
+  { top: "76px", right: "4px", delay: "5.1s" },
+  { top: "76px", right: "184px", delay: "1.4s" },
+  { top: "112px", right: "76px", delay: "3.8s" },
+  { top: "40px", right: "256px", delay: "6.3s" },
+  { top: "148px", right: "148px", delay: "4.4s" },
+];
+
 export default function Footer() {
   return (
-    <footer className="night bg-night text-moon">
-      <div className="mx-auto max-w-7xl px-4 pt-16 pb-8 sm:px-8 lg:px-18 lg:pt-20">
+    <footer className="relative night overflow-clip bg-night text-moon">
+      <div
+        aria-hidden="true"
+        className="bg-streak-grid pointer-events-none absolute inset-x-0 top-0 hidden h-72 mask-intersect mask-[linear-gradient(to_left,#000,transparent_70%),linear-gradient(to_bottom,#000_40%,transparent)] sm:block"
+      >
+        {squares.map((square, i) => (
+          <span
+            key={i}
+            className="absolute size-7 rounded-[7px] bg-ember-night opacity-0 animate-twinkle motion-reduce:animate-none"
+            style={{
+              top: square.top,
+              right: square.right,
+              animationDelay: square.delay,
+            }}
+          />
+        ))}
+      </div>
+      <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-8 sm:px-8 lg:px-18 lg:pt-20">
         <div aria-hidden="true" className="flex gap-2 sm:gap-2.5">
-          {week.map((d) => (
+          {week.map((d, i) => (
             <span
               key={d.name}
-              className={`size-7 rounded-[24%] sm:size-9 ${d.isToday ? "border-2 border-dashed border-dusk" : "bg-ember-night"}`}
-            />
+              className={`relative size-7 rounded-[24%] sm:size-9 border-2 border-dashed ${d.isToday ? "border-dusk" : "border-night-3"}`}
+            >
+              {d.isToday ? (
+                <span className="absolute -inset-0.5 rounded-[inherit] border-2 border-ember-night opacity-0 animate-today-pulse motion-reduce:animate-none" />
+              ) : (
+                <span
+                  className="scroll-fill absolute -inset-0.5 rounded-[inherit] bg-ember-night"
+                  style={
+                    {
+                      "--range": `cover ${20 + i * 25}px cover ${80 + i * 25}px`,
+                    } as React.CSSProperties
+                  }
+                />
+              )}
+            </span>
           ))}
         </div>
         <p className="mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] leading-none font-extrabold tracking-[-0.035em] text-balance">

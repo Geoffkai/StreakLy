@@ -16,7 +16,7 @@ export type Post = {
 
 export default function FeedPost({ post }: { post: Post }) {
   return (
-    <li className="p-4">
+    <li className="p-4 scroll-reveal">
       <div className="flex items-center gap-3">
         <span
           aria-hidden="true"
