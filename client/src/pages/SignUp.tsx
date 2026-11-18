@@ -121,7 +121,7 @@ export default function SignUp() {
         </button>
         {message && (
           <p role="alert" className="text-sm font-semibold text-ember-ink">
-            {message}c
+            {message}
           </p>
         )}
       </form>
