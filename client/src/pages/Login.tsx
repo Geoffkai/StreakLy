@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { Link } from "react-router";
+import { useLocation } from "react-router";
 
 export default function Login() {
+  const location = useLocation();
+  const resetMessage = location.state?.resetMessage ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -32,6 +36,7 @@ export default function Login() {
   return (
     <main>
       <form onSubmit={handleSubmit}>
+        {resetMessage && <p role="alert">{resetMessage}</p>}
         <label htmlFor="email">Enter your Email</label>
         <input
           id="email"
@@ -53,6 +58,8 @@ export default function Login() {
         <button type="submit" disabled={loading}>
           {loading ? "Logging In" : "Log In"}
         </button>
+        <br />
+        <Link to="/forgot-password">Forgot Password?</Link>
         {message && <p role="alert">{message}</p>}
       </form>
     </main>
