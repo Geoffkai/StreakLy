@@ -17,6 +17,12 @@ export default function SignUp() {
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    const cleanName = name.trim();
+    if (!cleanName) {
+      setMessage("The name should not be empty");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
@@ -24,8 +30,9 @@ export default function SignUp() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { name } },
+        options: { data: { name: cleanName } },
       });
+
       if (error) {
         setMessage(error.message);
       } else {
