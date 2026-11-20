@@ -110,7 +110,7 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - [x] Client: `AuthProvider` + `useAuth` — one shared session (`undefined` loading / `null` logged out / `Session`)
 - [x] Client: Route guards — `RequireAuth` (logged-out → `/login`, remembers where they were going) and `RedirectIfAuthed` (logged-in → back to that page, else `/today`)
 - [x] Client: Log out (UC03)
-- [ ] Client: Reset password (UC04)
+- [x] Client: Reset password (UC04)
 - [x] Server: `requireAuth` middleware — reads token, asks Supabase "who is this?" _(written, not yet tested)_
 - [x] Server: `GET /me` → returns `{ profile: { name } }` (no more raw `pg` result)
 - [x] Test: no token → `401`
@@ -136,8 +136,10 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 
 ### Phase 5 — First real feature: Manage Subjects → UC05 / FT_5
 
-- [ ] API: list, create, edit, archive, unarchive
-- [ ] Every query filters by `user_id` (privacy, NFR_1)
+- [x] API: list, create, edit, archive, unarchive (`GET /subjects`, `POST /subjects`, `PATCH /subjects/:id`, `PATCH /subjects/:id/archived`)
+- [x] Every query filters by `user_id` (privacy, NFR_1)
+- [x] Split into `subjects/` routes, controller, model (D8, D15)
+- [ ] Remove repeated code in the controller (name check, `22P02` / `23505` handling)
 - [ ] UI: Subjects page
 - [ ] ✅ **Milestone: first feature works end-to-end, deployed**
 
@@ -183,6 +185,9 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 | D12 | 2026-11-11 | Landing page on `/` combines the Ember Evolved exploration with StreakLy Brand & UI                                    | The direction the user chose                                                                                                                                                         |
 | D13 | 2026-11-11 | Grey `paper` background for now; Streak Grid logo; flame only as the in-app streak icon; no stock photos               | Background is one token, easy to swap. The flame is generic across streak apps; the grid is unique. Photos say nothing about the product                                             |
 | D14 | 2026-11-11 | Landing email form sends the visitor to `/signup` with `{ email }` in router state; browser does the validation        | No mailing list exists, so "check your inbox" would be false. `type="email"` + `required` avoids writing a regex                                                                     |
+| D15 | 2026-11-20 | Server code grouped by feature (`subjects/` holds routes, controller, model), not by layer. Only the model runs SQL; only the controller knows HTTP | Cohesion: files that change together live together. Matches the modules in PD_1 (NFR_5). By layer would spread one feature over three folders |
+| D16 | 2026-11-20 | Archive and unarchive share one route, `PATCH /subjects/:id/archived` with `{ "is_archived": true/false }` | One route instead of two near-identical ones. Named after the value it sets, so `false` reads correctly; the key matches the column and the GET response |
+| D17 | 2026-11-20 | Duplicates are caught by the DB `unique` constraint (`23505` → 409), not a `SELECT` before the `INSERT` | A pre-check has a race (double-click: both requests see "no", both insert). The constraint checks and inserts in one step |
 
 ---
 
@@ -220,6 +225,14 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **A CSS duration or delay needs a unit.** `"2400"` is thrown away; `"2400ms"` works.
 - **`motion-reduce:animate-none` freezes; `motion-reduce:hidden` removes.** Remove anything that would read as data when frozen (like the half-filled session tide).
 - **Check which module auto-import picked.** `Fragment` comes from `"react"`, not `"react/jsx-runtime"`.
+- **`result.rows` is always an array, even with no match.** `[]` is truthy, so `if (!result.rows)` never fires. Check `rows[0]`.
+- **An `UPDATE` that matches nothing is not an error.** It changes 0 rows and returns `[]`. An `INSERT` either returns the row or throws.
+- **Postgres error codes to translate:** `23505` duplicate → 409, `22P02` not a valid uuid (`/subjects/abc`) → 404. Check them with `err instanceof DatabaseError` (from `pg`) so TypeScript allows `err.code`.
+- **`if (!value)` rejects `false`.** For a boolean input, check `=== null`, or unarchiving (`false`) gets a 422.
+- **Postman's raw body defaults to Text.** Pick **JSON**, or `express.json()` skips the body and `req.body` is `undefined`. In Express 5, use `req.body?.name`.
+- **`req.params` in a separate controller is `string | string[]`.** Type it with `Request<{ id: string }>`. `req.params.id[0]` silences the error but gives the first character.
+- **`req.body` is `any`.** TypeScript won't warn when you pass it to a typed function, so validate it yourself.
+- **A handler that neither sends a response nor calls `next()` hangs the request.** An empty `catch {}` does exactly that.
 
 ---
 
@@ -323,6 +336,19 @@ Legend: `[ ]` todo · `[x]` done · `(UC / FT)` = RTM link
 - **Learned:** Clicking a reset link _is_ a login: Supabase checks the one-time token, makes a normal session and redirects with the tokens after `#` (the hash never reaches a server). supabase-js reads them on startup (`detectSessionInUrl`) and fires `PASSWORD_RECOVERY`. That's why the reset page can't sit inside `RedirectIfAuthed`. `redirectTo` must be a full URL: `window.location.origin` is the site, and `pathname` is only the path. JSX inside an event handler does nothing; only a returned element renders, so events use `navigate()`. `onChange` needs a function, not a call. Router state should be a labeled object because `/login` gets notes from more than one page. `signOut()` logs out every device, which is what you want after a reset. `CLIENT_ORIGIN` comes from `server/.env` locally and from the Render dashboard in production, and it lists the client (Vercel), not the server itself. "Declared but never read" usually points at the bug. `children` lets one shell wrap any page content. Spacing groups things: small gaps inside a group and big gaps between groups, so a title sits close to the form it names. `my-auto` in a flex column centers the content and pushes the next item to the bottom. A placeholder disappears as you type, so rules go in a hint linked with `aria-describedby`, and placeholders only show a format. Sign-up research: ask for the fewest fields. A name is worth it here because friends see it, and the email-prefix fallback would leak part of the email.
 - **Stuck on:** `redirectTo` as a bare path, then `pathname` instead of `origin`. An error message overwritten by the success message (missing `else`). `onChange={setPassword(password)}`, then an arrow function that still saved the old value. A `<Navigate>` inside the submit handler that never navigated. A link with no text. On the restyle: a hardcoded `type="password"` that made the eye do nothing (twice), silent Tailwind typos again (`outline-hiden`, `underliine`, `text--[14.5px]`, `mt-3` for `-mt-3`), and a hint placed inside the input's `relative` wrapper.
 - **Next:** From the code review, before pushing: remove the stray `c` after `{message}` in `SignUp.tsx`, and trim the name before sending it (a name of only spaces passes `required`). Fix the last commit's message with `git commit --amend` (it only touched Forgot/Reset). Then push the 3 local commits. Soon: give success messages their own non-error style (not orange `role="alert"`), and extract a shared `PasswordInput` (input + eye + hint) so Log in, Sign up and Reset stop drifting. Test the full email flow (link → new password → `/login` → old password fails, new one works) and a real sign-up with a name (check the `profiles` row). Check that the Supabase minimum password length is 8 to match the forms. Low priority: the reset form also shows for normal sessions; the "Password changed" note survives a reload; submitting with the eye on can skip the browser's save-password prompt. Still open from Day 7: set `engines.node` to `>=22` in `server/package.json`.
+
+### Day 12 — Fri, 2026-11-20
+
+- **Did:** Wrote `docs/CODE-GUIDE.md`, a guide to every file and function with suggested comments and a list of legacy-code issues for the maintainability deliverable. Fixed the wrong `RequireAuth` comment (it said users go to `/`). Sign up now trims the name, rejects a blank one, and sends it under the `name` key the profile trigger reads. Built the whole Subjects API (Phase 5): `GET /subjects` (own subjects, newest first), `POST /subjects` (201, 422 for a bad name, 409 for a duplicate), `PATCH /subjects/:id` (rename, 404 when not found or not yours), and `PATCH /subjects/:id/archived` (one route for archive and unarchive, D16). Every query filters by `id AND user_id`, so a valid token can't touch someone else's subject. Tested every route in Postman, including another user's id. Then refactored into `server/src/subjects/` with `subjects.routes.ts` (Express `Router`, `router.use(requireAuth)` once), `subjects.controller.ts` (validation, status codes, DB error codes) and `subjects.model.ts` (SQL only, typed with a `Subject` type). `index.ts` went from about 150 lines to 55. Same Postman results after the refactor.
+- **Learned:** The server gets the user id from the **verified token**, never from the URL or body; the token proves who you are, and `AND user_id` proves the row is yours. Send 404 for both "doesn't exist" and "isn't yours" so ids can't be probed. `res.locals` is a per-request box for passing data from middleware to the route, and it's never sent to the client. Status codes: 2xx ok (201 created), 4xx the client's fault (401, 404, 409, 422), 5xx the server's fault. POST returns the created item in the same shape as GET, so the client can add it to its list. Tables have no built-in order, so use `ORDER BY`. `trim()` returns a new string; `{ x }` sends the key `x`. A bare `return` is an early exit, and `finally` still runs. TypeScript basics: `: Type`, `type X = {...}`, `Type[]`, `A | B`, and `<Type>` to fill in a container (`Promise<Subject[]>`, `pool.query<Subject>`). A return type should say what can really happen: `INSERT` gives `Promise<Subject>`, `UPDATE` gives `Promise<Subject | undefined>`. MVC in an API: routes map paths, the controller handles HTTP, the model runs SQL; React is the view. Middleware calls `next()` or responds; the controller is the last stop, so it always responds. Grouping by feature vs by layer (D15). Why a `SELECT` before `INSERT` isn't enough (race condition, D17).
+- **Stuck on:** A ternary missing its `:` part. `if (cleanName)` instead of `if (!cleanName)`. `{ cleanName }` sending the wrong key. `result.rows<...>` (type arguments only go on functions and types). `res.json(201)` instead of `res.status(201)`. `if (!result.rows)` that never fired. Postman sending Text instead of JSON. `req.params.id[0]` to silence a TypeScript error. A missing `await` and `if (!findSubjectsByUser)` in the controller.
+- **Code review (2026-11-20, `d346c16..97e82b5`):** No real bugs. Ownership checks, validation and error handling all hold up. Small notes for later:
+  - **No profile row:** if a user somehow has no `profiles` row, `POST /subjects` fails with `23503` (foreign key) and returns a generic 500. Handle `23503`, or make sure the profile exists.
+  - **Case:** "Math" and "math" both get in, because `unique (user_id, name)` is case-sensitive. If they should count as the same, use a unique index on `(user_id, lower(name))`.
+  - **No max length** on subject names. Reject long names (for example over 100 characters) with 422 in both handlers.
+  - **HTML error page (older code):** if Supabase is unreachable, `requireAuth` calls `next(err)`, and with no error handler Express sends an HTML 500 instead of JSON. Return JSON in that `catch`, or add a JSON error handler in `index.ts`.
+  - **Redirect detail:** `RequireAuth` saves only `location.pathname`, so a query string like `?tab=x` is lost after login. Only matters once a page uses query strings.
+- **Next:** Commit `docs/CODE-GUIDE.md` (still untracked). Push. Remove the repeated code in the subjects controller (name check, `22P02`, `23505`). Decide on the case-insensitive and max-length rules from the review. Then the Subjects page in React (Phase 5 milestone: end to end, deployed). Later: move `GET /me` into its own module so `index.ts` has no SQL left. Still open from Day 7: set `engines.node` to `>=22` in `server/package.json`.
 
 <!-- Copy the block below for each new day -->
 <!--
