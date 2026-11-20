@@ -96,6 +96,7 @@ app.patch("/subjects/:id", requireAuth, async (req, res) => {
     if (err instanceof DatabaseError && err.code === "23505") {
       return res.status(409).json({ message: "Subject already exists" });
     }
+    //Not a valid uuid code (/subjects/abc)
     if (err instanceof DatabaseError && err.code === "22P02") {
       return res.status(404).json({ message: "No match found" });
     }
@@ -104,6 +105,35 @@ app.patch("/subjects/:id", requireAuth, async (req, res) => {
   }
 });
 
+app.patch("/subjects/:id/archived", requireAuth, async (req, res) => {
+  try {
+    const userId = res.locals.userId;
+    const subjectId = req.params.id;
+    const isArchived =
+      typeof req.body?.is_archived === "boolean" ? req.body?.is_archived : null;
+
+    if (isArchived === null) {
+      return res.status(422).json({ message: "Wrong or invalid format" });
+    }
+
+    const result = await pool.query(
+      "UPDATE subjects SET is_archived = $1 WHERE id = $2 AND user_id = $3 RETURNING id, name, is_archived",
+      [isArchived, subjectId, userId],
+    );
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ message: "No match found" });
+    }
+    return res.status(200).json({ subject: result.rows[0] });
+  } catch (err) {
+    //Not a valid uuid code (/subjects/abc)
+    if (err instanceof DatabaseError && err.code === "22P02") {
+      return res.status(404).json({ message: "No match found" });
+    }
+    console.error(err);
+    res.status(500).json({ ok: false });
+  }
+});
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
