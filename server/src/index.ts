@@ -72,7 +72,37 @@ app.post("/subjects", requireAuth, async (req, res) => {
   }
 });
 
-app.patch("/subjects/:id");
+app.patch("/subjects/:id", requireAuth, async (req, res) => {
+  try {
+    const updatedCleanName =
+      typeof req.body?.name === "string" ? req.body.name.trim() : null;
+    const userId = res.locals.userId;
+    const subjectId = req.params.id;
+
+    if (!updatedCleanName) {
+      return res.status(422).json({ message: "Wrong or invalid name format" });
+    }
+
+    const result = await pool.query(
+      "UPDATE subjects SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING id, name, is_archived",
+      [updatedCleanName, subjectId, userId],
+    );
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ message: "No match found" });
+    }
+    return res.status(200).json({ subject: result.rows[0] });
+  } catch (err) {
+    if (err instanceof DatabaseError && err.code === "23505") {
+      return res.status(409).json({ message: "Subject already exists" });
+    }
+    if (err instanceof DatabaseError && err.code === "22P02") {
+      return res.status(404).json({ message: "No match found" });
+    }
+    console.error(err);
+    res.status(500).json({ ok: false });
+  }
+});
 
 app.get("/health", (req, res) => {
   res.json({ ok: true });
