@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import { pool } from "./config/db";
 import { requireAuth } from "./middleware/requireAuth";
+import { DatabaseError } from "pg";
 
 const app = express(); //create the app
 
@@ -13,7 +14,7 @@ app.use(
 );
 app.use(express.json()); //let it read JSON request bodies
 
-app.get("/me", requireAuth, async (req, res) => {
+app.get("/me", requireAuth, async (_req, res) => {
   try {
     const userId = res.locals.userId;
     const result = await pool.query("SELECT name FROM profiles WHERE id = $1", [
@@ -30,6 +31,48 @@ app.get("/me", requireAuth, async (req, res) => {
     res.status(500).json({ ok: false });
   }
 });
+
+app.get("/subjects", requireAuth, async (_req, res) => {
+  try {
+    const userId = res.locals.userId;
+    const result = await pool.query(
+      "SELECT id, name, is_archived FROM subjects WHERE user_id = $1 ORDER BY created_at DESC",
+      [userId],
+    );
+
+    return res.status(200).json({ subjects: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false });
+  }
+});
+
+app.post("/subjects", requireAuth, async (req, res) => {
+  try {
+    const subjectCleanName =
+      typeof req.body?.name === "string" ? req.body.name.trim() : null;
+    const userId = res.locals.userId;
+
+    if (!subjectCleanName) {
+      return res.status(422).json({ message: "Wrong or invalid name format" });
+    }
+
+    const result = await pool.query(
+      "INSERT INTO subjects (name, user_id) VALUES ($1, $2) RETURNING id, name, is_archived",
+      [subjectCleanName, userId],
+    );
+
+    return res.status(201).json({ subject: result.rows[0] });
+  } catch (err) {
+    if (err instanceof DatabaseError && err.code === "23505") {
+      return res.status(409).json({ message: "Subject already exists" });
+    }
+    console.error(err);
+    res.status(500).json({ ok: false });
+  }
+});
+
+app.patch("/subjects/:id");
 
 app.get("/health", (req, res) => {
   res.json({ ok: true });
