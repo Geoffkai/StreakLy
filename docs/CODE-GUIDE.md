@@ -2,10 +2,11 @@
 
 What every directory, file, and function does, plus a ready-to-paste comment for each one.
 
-Use this guide two ways:
+Use this guide three ways:
 
 1. **To read the codebase.** Start with [Project map](#1-project-map) and [How the pieces connect](#2-how-the-pieces-connect).
-2. **To comment the code.** Each file in [File reference](#4-file-reference) has a *Suggested comments* block. Paste them where it says, and change any wording you like.
+2. **To comment the code.** Each file in [File reference](#4-file-reference) has a *Suggested comments* block for lines and functions that aren't immediately understandable. Paste them where it says, and change any wording you like.
+3. **To submit the activity.** [Section 6](#6-function-and-comment-list-lms-submission) is the list of functions and their comments for the LMS. Submit it only after the comments are in the code.
 
 Section 5, [Maintainability notes](#5-maintainability-notes), lists comments that are wrong, leftover template code, and repeated code. These are the "legacy code" issues to fix or mention in the deliverable.
 
@@ -17,7 +18,7 @@ These follow common practice in professional TypeScript/React teams.
 
 ### The rule: comment the *why*, not the *what*
 
-The code already says *what* it does. A comment should say what the code **can't**: the reason, the rule it follows, or what breaks if someone changes it.
+The code already says *what* it   does. A comment should say what the code **can't**: the reason, the rule it follows, or what breaks if someone changes it.
 
 ```ts
 // Bad: repeats the code
@@ -30,7 +31,7 @@ setLoading(true); // set loading to true
 ### Three kinds of comments
 
 | Kind | Syntax | Where | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Doc comment** (TSDoc) | `/** ... */` | Directly above an exported function, component, type, or constant | Shows up when you hover the name in VS Code. Say what it is, what it needs, and what it returns. |
 | **Inline comment** | `//` | Above or beside one tricky line | Says why that line exists. |
 | **File header** | `/** ... */` at the top | Only in files whose purpose isn't clear from the name | One or two sentences on the file's job. Most files don't need one. |
@@ -40,7 +41,7 @@ In JSX, use `{/* ... */}` inside the markup. In SQL, use `--`. In CSS, use `/* .
 ### TSDoc tags (use only when they add something)
 
 | Tag | Meaning | Example |
-|---|---|---|
+| --- | --- | --- |
 | `@param name` | What an argument is | `@param token - The Supabase access token` |
 | `@returns` | What comes back | `@returns The profile row, or 404` |
 | `@throws` | When it throws | `@throws If VITE_SUPABASE_URL is missing` |
@@ -61,7 +62,7 @@ type AuthShellProps = {
 ### Marker tags
 
 | Tag | Use for |
-|---|---|
+| --- | --- |
 | `// TODO:` | Planned work that isn't done yet |
 | `// FIXME:` | Known bug or wrong behavior |
 | `// NOTE:` | Important context a future reader must not miss |
@@ -72,6 +73,14 @@ type AuthShellProps = {
 - Every Tailwind class
 - Code that's commented out (delete it; Git keeps the history)
 - Your name or the date (Git records both)
+
+### Comment or commit message?
+
+| Put it in a code comment when | Put it in the commit message when |
+| --- | --- |
+| A reader needs it while looking at that line | A reader needs it to understand the change |
+| It explains a rule, reason, or gotcha that still applies | It explains why the code changed at that time |
+| Example: why `user_id` is in a `WHERE` clause | Example: why subjects were split into routes, controller, and model |
 
 ---
 
@@ -96,10 +105,11 @@ StreakLy/
 │   └── vercel.json         Sends every URL to index.html so React Router works.
 ├── server/                 Express API. Deployed to Render.
 │   └── src/
-│       ├── index.ts        Creates the app, sets middleware, defines routes.
+│       ├── index.ts        Creates the app, sets middleware, defines and mounts routes.
 │       ├── config/db.ts    PostgreSQL connection pool.
 │       ├── lib/supabase.ts Supabase client used only to check tokens.
-│       └── middleware/     Code that runs before routes (requireAuth).
+│       ├── middleware/     Code that runs before routes (requireAuth).
+│       └── subjects/       Subjects API: routes, controller, model.
 ├── db/                     SQL scripts, run in order in the Supabase SQL Editor.
 ├── design/                 Design files and mockups (not shipped).
 ├── docs/                   Product docs, requirements, dev log, this guide.
@@ -110,12 +120,13 @@ StreakLy/
 **Suggested README line per folder** (if your instructor wants folder-level docs, put a short `README.md` in each, or paste these into the root README):
 
 | Folder | One-liner |
-|---|---|
+| --- | --- |
 | `client/src/auth/` | Holds the current login session and the route guards that use it. |
 | `client/src/pages/` | Top-level screens. Each file matches one route in `App.tsx`. |
 | `client/src/components/` | Reusable pieces of pages, grouped by the page that uses them. |
 | `client/src/lib/` | One-time setup for outside services, shared across the app. |
 | `server/src/middleware/` | Express middleware that runs before route handlers. |
+| `server/src/subjects/` | Subjects API, split into routes (URLs), controller (HTTP), and model (SQL). |
 | `db/` | Database schema. Files are numbered and must run in order. |
 
 ---
@@ -157,12 +168,24 @@ server  requireAuth ─ supabase.auth.getUser(token) ─ sets res.locals.userId
         /me route ─ SELECT name FROM profiles WHERE id = $1
 ```
 
+### Handling a subjects request
+
+```
+client ─ PATCH /subjects/:id  (header: Authorization: Bearer <token>)
+            │
+subjects.routes.ts      requireAuth runs first for every /subjects route
+            │
+subjects.controller.ts  validates input and chooses the HTTP status
+            │
+subjects.model.ts       runs SQL limited to this user's rows
+```
+
 ### The session has three states
 
 Used across `auth/` and `ResetPassword.tsx`. Worth knowing before reading any of them.
 
 | Value | Meaning | What guards do |
-|---|---|---|
+| --- | --- | --- |
 | `undefined` | Supabase hasn't answered yet | Render nothing (avoids a flash of the wrong page) |
 | `null` | Logged out | Redirect or show logged-out UI |
 | `Session` | Logged in | Show the page |
@@ -174,7 +197,7 @@ Used across `auth/` and `ResetPassword.tsx`. Worth knowing before reading any of
 There is no `.env.example` yet (see [5.8](#58-no-envexample-files)). Both apps stop at startup with an error if a required value is missing.
 
 | App | Variable | Used in | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | client | `VITE_SUPABASE_URL` | `lib/supabase.ts` | Supabase project URL |
 | client | `VITE_SUPABASE_ANON_KEY` | `lib/supabase.ts` | Public key. Safe in the browser; the database's rules decide access. |
 | client | `VITE_API_URL` | not used yet | Base URL of the Express API |
@@ -241,7 +264,7 @@ function App() {
 ```tsx
       {/* No guard on purpose: the email reset link logs the user in with a
           temporary session, so RedirectIfAuthed would bounce them to /today. */}
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 ```
 
 ---
@@ -291,7 +314,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 **Purpose:** Defines the auth context and the hook components use to read the session.
 
 | Export | What it does |
-|---|---|
+| --- | --- |
 | `AuthContext` | React context holding `{ session }`. Default is `null` so the hook can tell if the provider is missing. |
 | `useAuth()` | Returns `{ session }`. Throws if used outside `<AuthProvider>`. |
 
@@ -358,7 +381,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 |---|---|
 | `RequireAuth()` | Loading: renders nothing. Logged out: redirects to `/login` and saves the current path in `state.from`. Logged in: renders the child route. |
 
-**Suggested comments** (the current comment is wrong, see [5.1](#51-wrong-comment-in-requireauthtsx))
+**Suggested comments** (the doc comment is already in the code, so only the inline comment needs adding)
 
 ```tsx
 /**
@@ -430,7 +453,7 @@ export default function Landing() {
 **Purpose:** Create-account form at `/signup`.
 
 | Item | What it does |
-|---|---|
+| --- | --- |
 | `preEmail` | Email typed into the Hero form on the landing page, passed through router state. |
 | `handleSubmit(e)` | Calls `supabase.auth.signUp` with email, password, and `name` in `options.data`. Shows the error, or tells the user to check their email. |
 | `isPasswordShown` | Toggles the password field between hidden and visible. |
@@ -454,10 +477,10 @@ export default function SignUp() {
 
 ```tsx
         // `name` goes into user metadata; the profile trigger reads it from there.
-        options: { data: { name } },
+        options: { data: { name: cleanName } },
 ```
 
-Replace the existing comment on line 32 with:
+Replace the existing comment on line 39 with:
 
 ```tsx
         // Email confirmation is on, so there is no session until they click the link.
@@ -471,7 +494,7 @@ Replace the existing comment on line 32 with:
 **Purpose:** Log-in form at `/login`.
 
 | Item | What it does |
-|---|---|
+| --- | --- |
 | `resetMessage` | Success notice sent from `ResetPassword` after a password change. |
 | `handleSubmit(e)` | Calls `signInWithPassword`. Only handles errors; success is handled by the guard. |
 | `isPasswordShown` | Show/hide password toggle. |
@@ -523,8 +546,7 @@ export default function ForgotPassword() {
 ```
 
 ```tsx
-        // Same message whether or not the email exists, so this form can't be
-        // used to check who has an account.
+        // Worded so this form doesn't reveal whether an email has an account.
         setMessage(
 ```
 
@@ -535,7 +557,7 @@ export default function ForgotPassword() {
 **Purpose:** Where the reset email link lands. Lets the user choose a new password.
 
 | Item | What it does |
-|---|---|
+| --- | --- |
 | `session` check | The reset link logs the user in with a temporary session. No session means the link is invalid, expired, or already used. |
 | `handleSubmit(e)` | Calls `updateUser({ password })`, then signs out and goes to `/login` with a success message. |
 
@@ -650,7 +672,7 @@ export default function Header() {
 **Purpose:** First section: headline, email form, and animated week of streak squares.
 
 | Item | What it does |
-|---|---|
+| --- | --- |
 | `daySquares` | Positions and delays for the twinkling squares in the background grid. |
 | `streak` | Number of finished days in `week`, shown as the streak count. |
 | `handleSubmit(e)` | Reads the email from the form and opens `/signup` with it in router state. |
@@ -732,7 +754,7 @@ export default function FeedPost({ post }: { post: Post }) {
 **Purpose:** A toggle button for one reaction (fire, clap, heart) with a count.
 
 | Item | What it does |
-|---|---|
+| --- | --- |
 | `isPressed` | Local on/off state, starting from the `pressed` prop. |
 | `shownCount` | Adjusts `count` by one when the user's click differs from the starting state. |
 | `ariaLabel` | Reads "Fire, 3 reactions" for screen readers. |
@@ -792,7 +814,7 @@ export default function Footer() {
 **Purpose:** All global styling. Tailwind is loaded here, and this file adds the design tokens and custom utilities.
 
 | Block | What it does |
-|---|---|
+| --- | --- |
 | `@theme { --color-* }` | Design tokens. Each becomes Tailwind classes (`--color-ember` → `bg-ember`, `text-ember`). |
 | `@theme { --font-* }` | Font families (`font-display`, `font-ui`). Fonts load in `index.html`. |
 | `@theme { --animate-* }` + `@keyframes` | Named animations, used as `animate-twinkle` etc. |
@@ -836,10 +858,11 @@ export default function Footer() {
 **Purpose:** Creates the Express app, sets middleware, defines routes, and starts listening.
 
 | Route | Auth | What it does |
-|---|---|---|
+| --- | --- | --- |
 | `GET /me` | Yes | Returns the logged-in user's profile name. 404 if no profile row. |
 | `GET /health` | No | Returns `{ ok: true }` if the server is up. |
 | `GET /health/db` | No | Runs `select 1` to check the database connection. |
+| `/subjects` | Yes | Mounts the subjects router. See [`subjects.routes.ts`](#serversrcsubjectssubjectsroutests). |
 
 **Suggested comments**
 
@@ -864,7 +887,7 @@ app.use(
  *
  * @returns 200 `{ profile: { name } }`, 404 if no profile, 500 on DB error.
  */
-app.get("/me", requireAuth, async (req, res) => {
+app.get("/me", requireAuth, async (_req, res) => {
 ```
 
 ```ts
@@ -874,7 +897,7 @@ app.get("/me", requireAuth, async (req, res) => {
 ```
 
 ```ts
-/** GET /health — server is up. Used by Render to check the deploy. */
+/** GET /health — confirms the server is running. */
 app.get("/health", (req, res) => {
 ```
 
@@ -927,7 +950,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 **Purpose:** Express middleware that rejects requests without a valid Supabase token.
 
 | Step | What happens |
-|---|---|
+| --- | --- |
 | 1 | Reads `Authorization: Bearer <token>`. |
 | 2 | Missing or malformed header: 401. |
 | 3 | `supabase.auth.getUser(token)` asks Supabase if the token is valid. |
@@ -949,9 +972,163 @@ export async function requireAuth(
 ```
 
 ```ts
-    // Asks Supabase to verify the token. Works even if a user was deleted or
-    // logged out, unlike checking the token's signature locally.
+    // Asks Supabase instead of only checking the signature locally, so a
+    // deleted user or ended session is rejected before the token expires.
     const { data, error } = await supabase.auth.getUser(token);
+```
+
+---
+
+#### `server/src/subjects/subjects.routes.ts`
+
+**Purpose:** Maps each `/subjects` URL to its controller function and protects all of them with `requireAuth`.
+
+| Route | Handler | Success | Errors |
+| --- | --- | --- | --- |
+| `GET /subjects` | `listSubjects` | 200 `{ subjects }` | 401, 500 |
+| `POST /subjects` | `addSubject` | 201 `{ subject }` | 401, 409, 422, 500 |
+| `PATCH /subjects/:id` | `renameSubject` | 200 `{ subject }` | 401, 404, 409, 422, 500 |
+| `PATCH /subjects/:id/archived` | `setSubjectArchived` | 200 `{ subject }` | 401, 404, 422, 500 |
+
+**Suggested comments**
+
+```ts
+// Runs before every route below and sets res.locals.userId for the controllers.
+router.use(requireAuth);
+```
+
+---
+
+#### `server/src/subjects/subjects.controller.ts`
+
+**Purpose:** Handles the HTTP side of subjects: reads the request, validates input, calls the model, and maps results and database errors to status codes.
+
+| Function | What it does |
+| --- | --- |
+| `listSubjects(req, res)` | Returns all of the user's subjects. |
+| `addSubject(req, res)` | Trims and validates `name`, then creates the subject. |
+| `renameSubject(req, res)` | Trims and validates `name`, then renames the user's subject. |
+| `setSubjectArchived(req, res)` | Validates `is_archived`, then archives or restores the user's subject. |
+
+**Suggested comments**
+
+```ts
+/**
+ * GET /subjects — all of the logged-in user's subjects, newest first.
+ *
+ * @returns 200 `{ subjects }`, or 500 on a database error.
+ */
+export async function listSubjects(_req: Request, res: Response) {
+```
+
+```ts
+/**
+ * POST /subjects — creates a subject for the logged-in user.
+ *
+ * @returns 201 `{ subject }`, 422 if the name is missing or blank, 409 if the
+ *          user already has that name, or 500 on a database error.
+ */
+export async function addSubject(req: Request, res: Response) {
+```
+
+```ts
+/**
+ * PATCH /subjects/:id — renames one of the user's subjects.
+ *
+ * @returns 200 `{ subject }`, 422 if the name is missing or blank, 404 if the id
+ *          is malformed or not theirs, 409 if the name is taken, or 500.
+ */
+export async function renameSubject(
+```
+
+```ts
+/**
+ * PATCH /subjects/:id/archived — archives or restores one of the user's subjects.
+ *
+ * @returns 200 `{ subject }`, 422 unless `is_archived` is a boolean, 404 if the
+ *          id is malformed or not theirs, or 500.
+ */
+export async function setSubjectArchived(
+```
+
+```ts
+    // Non-strings become null and blank names become "", so one check rejects both.
+    const subjectCleanName =
+```
+
+```ts
+    // null marks invalid input, so `false` (restore) still passes the check below.
+    const isArchived =
+```
+
+```ts
+    // 23505 = unique violation: this user already has a subject with this name.
+    if (err instanceof DatabaseError && err.code === "23505") {
+```
+
+```ts
+    // 22P02 = invalid UUID text (/subjects/abc). Treated like an id that doesn't exist.
+    if (err instanceof DatabaseError && err.code === "22P02") {
+```
+
+---
+
+#### `server/src/subjects/subjects.model.ts`
+
+**Purpose:** Holds the SQL for subjects. Every query is limited to one user's rows.
+
+| Export | What it does |
+| --- | --- |
+| `Subject` | The subject fields returned by the API. |
+| `findSubjectsByUser(userId)` | Selects the user's subjects, newest first. |
+| `createSubject(name, userId)` | Inserts a subject and returns it. |
+| `updateSubjectName(name, subjectId, userId)` | Renames a subject the user owns. |
+| `updateSubjectArchived(isArchived, subjectId, userId)` | Sets the archived flag on a subject the user owns. |
+
+**Suggested comments**
+
+```ts
+/** A subject as returned by the API. `user_id` is deliberately left out. */
+export type Subject = {
+```
+
+```ts
+/** Returns all of a user's subjects, including archived ones, newest first. */
+export async function findSubjectsByUser(userId: string): Promise<Subject[]> {
+```
+
+```ts
+/**
+ * Inserts a subject for a user and returns the new row.
+ *
+ * @throws DatabaseError 23505 if the user already has this name.
+ */
+export async function createSubject(
+```
+
+```ts
+/**
+ * Renames a subject only if it belongs to the user.
+ *
+ * @returns The updated subject, or undefined if no row matched.
+ * @throws DatabaseError 23505 if the name is taken, or 22P02 if the id isn't a UUID.
+ */
+export async function updateSubjectName(
+```
+
+```ts
+/**
+ * Sets a subject's archived flag only if it belongs to the user.
+ *
+ * @returns The updated subject, or undefined if no row matched.
+ * @throws DatabaseError 22P02 if the id isn't a UUID.
+ */
+export async function updateSubjectArchived(
+```
+
+```ts
+  // `AND user_id` stops one user from changing another user's subject.
+  const result = await pool.query<Subject>(
 ```
 
 ---
@@ -963,7 +1140,7 @@ export async function requireAuth(
 **Purpose:** Creates every table, relationship, and rule. Runs in one transaction, so it all succeeds or nothing is created.
 
 | Table | Stores | Key rules |
-|---|---|---|
+| --- | --- | --- |
 | `profiles` | Public info per user (name) | `id` = `auth.users.id`. Deleted with the user. |
 | `subjects` | A user's subjects (e.g. "Linear Algebra") | Name unique per user. |
 | `topics` | Topics in a subject, with estimated hours | Name unique per subject. Hours > 0. |
@@ -1012,7 +1189,7 @@ alter table profiles enable row level security;
 **Purpose:** When Supabase Auth creates a user, this trigger creates their `profiles` row.
 
 | Item | What it does |
-|---|---|
+| --- | --- |
 | `handle_new_user()` | Inserts `(id, name)` into `public.profiles`. Name comes from sign-up metadata, or the part of the email before `@`. |
 | `on_auth_user_created` | Runs `handle_new_user()` after each insert into `auth.users`. |
 
@@ -1038,9 +1215,9 @@ create function public.handle_new_user() returns trigger language plpgsql securi
 
 Issues found while writing this guide. These are the "legacy code" smells: misleading comments, template leftovers, and repetition. Fix them, or list them in the deliverable as identified issues.
 
-### 5.1 Wrong comment in `RequireAuth.tsx`
+### 5.1 Inaccurate comment in `requireAuth.ts`
 
-[client/src/auth/RequireAuth.tsx:4](../client/src/auth/RequireAuth.tsx#L4) says logged-out users are "sent to /". The code sends them to `/login`. A wrong comment is worse than none. Replace it with the comment in [4.3](#clientsrcauthrequireauthtsx).
+[server/src/middleware/requireAuth.ts:9](../server/src/middleware/requireAuth.ts#L9) says the header is split "once into two parts". `split(" ")` splits at every space and the code keeps the first two parts. A wrong comment is worse than none. Replace it with `// Expected format: "Bearer <token>".`
 
 ### 5.2 Incomplete comment in `RedirectIfAuthed.tsx`
 
@@ -1052,7 +1229,7 @@ Issues found while writing this guide. These are the "legacy code" smells: misle
 
 ### 5.4 Comments that do nothing
 
-[EstimateBand.tsx:2-4](../client/src/components/landing/EstimateBand.tsx#L2-L4), [Hero.tsx:34-36](../client/src/components/landing/Hero.tsx#L34-L36), and [Friends.tsx:40-42](../client/src/components/landing/Friends.tsx#L40-L42) contain:
+[EstimateBand.tsx:2-4](../client/src/components/landing/EstimateBand.tsx#L2-L4), [Hero.tsx:34-36](../client/src/components/landing/Hero.tsx#L34-L36), [Friends.tsx:40-42](../client/src/components/landing/Friends.tsx#L40-L42), and [HowItWorks.tsx:2-4](../client/src/components/landing/HowItWorks.tsx#L2-L4) contain:
 
 ```tsx
   {
@@ -1064,13 +1241,14 @@ Outside JSX this is an empty code block holding a comment, which Prettier format
 
 ### 5.5 Unclear comment in `SignUp.tsx`
 
-[SignUp.tsx:32](../client/src/pages/SignUp.tsx#L32): "This is set because in the production this should be the message" doesn't say why. Suggested replacement is in [4.4](#clientsrcpagessignuptsx).
+[SignUp.tsx:39](../client/src/pages/SignUp.tsx#L39): "This is set because in the production this should be the message" doesn't say why. Suggested replacement is in [4.4](#clientsrcpagessignuptsx).
 
 ### 5.6 Repeated code
 
 - The show/hide password input (input + eye button, about 25 lines) is copied in `Login.tsx`, `SignUp.tsx`, and `ResetPassword.tsx`. A `PasswordInput` component in `components/auth/` would put it in one place.
 - The same long input `className` appears in all four auth pages. A shared component or constant would mean one edit changes all of them.
 - All four auth pages repeat the same `loading` / `message` / `try-catch-finally` flow (see the pattern in [4.4](#44-client-pages)).
+- `addSubject` and `renameSubject` repeat the name validation, and `renameSubject` and `setSubjectArchived` repeat the database error handling.
 
 ### 5.7 Possibly unused files (Vite template leftovers)
 
@@ -1095,3 +1273,81 @@ Search the project once more before deleting.
 - The root `README.md` is empty. It should at least say what StreakLy is and how to run both apps.
 - Error messages name the env file differently: `config/db.ts` says ".env", `lib/supabase.ts` says "server/.env".
 - `VITE_API_URL` is set in `client/.env` but not used yet.
+
+### 5.10 `/reset-password` accepts any session
+
+[ResetPassword.tsx:48](../client/src/pages/ResetPassword.tsx#L48) only checks that a session exists. A user who is already logged in can open `/reset-password` directly and get the new-password form without using an email link. Fix this by allowing the form only after Supabase fires the `PASSWORD_RECOVERY` auth event.
+
+---
+
+## 6. Function and comment list (LMS submission)
+
+This is the list the activity asks for. Before submitting:
+
+1. Paste each comment directly above its function, replacing any existing comment on that function.
+2. Add the line-level comments from [Section 4](#4-file-reference) for code that isn't immediately understandable.
+3. If you reword a comment in the code, make the same change here so the list matches.
+
+### Client: app and auth
+
+| Function | File | Comment |
+| --- | --- | --- |
+| `App` | `client/src/App.tsx` | App route table. Guards are layout routes: they run first, then render the child page through `<Outlet />`. |
+| `AuthProvider` | `client/src/auth/AuthProvider.tsx` | Holds the Supabase session and shares it through AuthContext. Wrap the app with this once (see main.tsx). Read it with useAuth(). |
+| `useAuth` | `client/src/auth/useAuth.ts` | Reads the current session from AuthProvider. `@returns` The auth value: `{ session }`. `@throws` If called outside `<AuthProvider>`, so a missing provider fails loudly instead of acting like a logged-out user. |
+| `RequireAuth` | `client/src/auth/RequireAuth.tsx` | Route guard for pages that need a logged-in user. Sends logged-out users to /login and saves where they were going in `state.from`, so RedirectIfAuthed can send them back after login. |
+| `RedirectIfAuthed` | `client/src/auth/RedirectIfAuthed.tsx` | Route guard for logged-out pages (/, /login, /signup). Sends logged-in users to the page they were trying to reach before login (set by RequireAuth), or to /today. |
+| `AuthShell` | `client/src/components/auth/AuthShell.tsx` | Shared layout for the auth pages: logo, tagline, title, and privacy note. |
+
+### Client: pages
+
+| Function | File | Comment |
+| --- | --- | --- |
+| `Landing` | `client/src/pages/Landing.tsx` | Public landing page at "/". Arranges the sections in components/landing/. |
+| `SignUp` | `client/src/pages/SignUp.tsx` | Sign-up page at /signup. Creates a Supabase user. The database trigger in db/002_profile_trigger.sql then creates the matching row in `profiles`. |
+| `SignUp.handleSubmit` | `client/src/pages/SignUp.tsx` | Rejects a blank name, then creates the account and asks the user to confirm their email. |
+| `Login` | `client/src/pages/Login.tsx` | Log-in page at /login. On success this page does nothing else: the new session reaches RedirectIfAuthed, which sends the user to /today. |
+| `Login.handleSubmit` | `client/src/pages/Login.tsx` | Logs in with email and password. Only errors are handled here because RedirectIfAuthed handles success. |
+| `ForgotPassword` | `client/src/pages/ForgotPassword.tsx` | Forgot-password page. Emails a reset link that opens /reset-password. |
+| `ForgotPassword.handleSubmit` | `client/src/pages/ForgotPassword.tsx` | Requests a reset email whose link returns to this site's /reset-password page. |
+| `ResetPassword` | `client/src/pages/ResetPassword.tsx` | Reset-password page, opened from the link in the reset email. The link signs the user in with a temporary session. With no session the link is invalid or used, so we show "Link expired" instead of the form. |
+| `ResetPassword.handleSubmit` | `client/src/pages/ResetPassword.tsx` | Saves the new password, then signs out so the user logs in again with it. |
+| `Today` | `client/src/pages/Today.tsx` | Today page: the user's home after login. TODO: Replace placeholder with today's plan and study timer. |
+| `Today.handleLogout` | `client/src/pages/Today.tsx` | No navigate() needed: after signOut, RequireAuth redirects to /login. |
+
+### Client: landing components
+
+| Function | File | Comment |
+| --- | --- | --- |
+| `Header` | `client/src/components/landing/Header.tsx` | Landing page top bar. Sticks to the top while scrolling. |
+| `Hero` | `client/src/components/landing/Hero.tsx` | Landing hero: headline, email signup, and the demo streak week. |
+| `Hero.handleSubmit` | `client/src/components/landing/Hero.tsx` | Send the email to SignUp so the user doesn't type it twice. |
+| `EstimateBand` | `client/src/components/landing/EstimateBand.tsx` | Landing section: estimated vs. actual study time, with a sample bar. |
+| `HowItWorks` | `client/src/components/landing/HowItWorks.tsx` | Landing "How it works" steps. Anchor target for the header link #how. |
+| `Friends` | `client/src/components/landing/Friends.tsx` | Landing section: friends-only feed with sample posts. |
+| `FeedPost` | `client/src/components/landing/FeedPost.tsx` | One post in the landing page friends feed. |
+| `ReactionButton` | `client/src/components/landing/ReactionButton.tsx` | Reaction toggle with a live count. `@remarks` Demo only: the state lives in this component and is never saved. |
+| `Footer` | `client/src/components/landing/Footer.tsx` | Landing footer in the night theme. `@remarks` The `night` class swaps the streak square colors (see index.css). |
+
+### Server
+
+| Function | File | Comment |
+| --- | --- | --- |
+| `GET /me` handler | `server/src/index.ts` | GET /me — the logged-in user's profile. `@returns` 200 `{ profile: { name } }`, 404 if no profile, 500 on DB error. |
+| `GET /health` handler | `server/src/index.ts` | GET /health — confirms the server is running. |
+| `GET /health/db` handler | `server/src/index.ts` | GET /health/db — server can reach the database. |
+| `requireAuth` | `server/src/middleware/requireAuth.ts` | Express middleware: only lets requests with a valid Supabase token through. Expects `Authorization: Bearer <access_token>`. On success, sets `res.locals.userId` for the route handler. `@returns` 401 if the header is missing or the token is invalid or expired. |
+| `listSubjects` | `server/src/subjects/subjects.controller.ts` | GET /subjects — all of the logged-in user's subjects, newest first. `@returns` 200 `{ subjects }`, or 500 on a database error. |
+| `addSubject` | `server/src/subjects/subjects.controller.ts` | POST /subjects — creates a subject for the logged-in user. `@returns` 201 `{ subject }`, 422 if the name is missing or blank, 409 if the user already has that name, or 500 on a database error. |
+| `renameSubject` | `server/src/subjects/subjects.controller.ts` | PATCH /subjects/:id — renames one of the user's subjects. `@returns` 200 `{ subject }`, 422 if the name is missing or blank, 404 if the id is malformed or not theirs, 409 if the name is taken, or 500. |
+| `setSubjectArchived` | `server/src/subjects/subjects.controller.ts` | PATCH /subjects/:id/archived — archives or restores one of the user's subjects. `@returns` 200 `{ subject }`, 422 unless `is_archived` is a boolean, 404 if the id is malformed or not theirs, or 500. |
+| `findSubjectsByUser` | `server/src/subjects/subjects.model.ts` | Returns all of a user's subjects, including archived ones, newest first. |
+| `createSubject` | `server/src/subjects/subjects.model.ts` | Inserts a subject for a user and returns the new row. `@throws` DatabaseError 23505 if the user already has this name. |
+| `updateSubjectName` | `server/src/subjects/subjects.model.ts` | Renames a subject only if it belongs to the user. `@returns` The updated subject, or undefined if no row matched. `@throws` DatabaseError 23505 if the name is taken, or 22P02 if the id isn't a UUID. |
+| `updateSubjectArchived` | `server/src/subjects/subjects.model.ts` | Sets a subject's archived flag only if it belongs to the user. `@returns` The updated subject, or undefined if no row matched. `@throws` DatabaseError 22P02 if the id isn't a UUID. |
+
+### Database
+
+| Function | File | Comment |
+| --- | --- | --- |
+| `handle_new_user` | `db/002_profile_trigger.sql` | Creates a profile row for every new sign-up. security definer: runs with the owner's rights, because the auth system that inserts the user can't write to public.profiles itself. search_path = '': blocks search_path tricks; that's why every name is written in full (public.profiles). |
